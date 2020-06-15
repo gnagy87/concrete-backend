@@ -37,6 +37,10 @@ public class Training {
     private Long organizerId;
     @Column(name = "is_held")
     private boolean isHeld;
+    @Basic(optional = false)
+    @Column(name = "created_at", insertable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
     @ManyToMany(mappedBy = "trainings")
     private Set<PoleUser> poleUsers;
 }
