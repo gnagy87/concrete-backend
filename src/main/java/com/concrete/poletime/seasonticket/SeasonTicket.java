@@ -1,5 +1,6 @@
 package com.concrete.poletime.seasonticket;
 
+import com.concrete.poletime.user.PoleUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,4 +25,11 @@ public class SeasonTicket {
     private int amount;
     @Column(nullable = false, name = "seller_id")
     private Long sellerId;
+    @Basic(optional = false)
+    @Column(name = "created_at", insertable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private PoleUser poleUser;
 }

@@ -1,5 +1,7 @@
 package com.concrete.poletime.user;
 
+import com.concrete.poletime.seasonticket.SeasonTicket;
+import com.concrete.poletime.training.Training;
 import com.concrete.poletime.utils.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -35,5 +38,13 @@ public class PoleUser {
     @Column(name = "created_at", insertable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "poleUser", fetch = FetchType.LAZY)
+    private Set<SeasonTicket> seasonTickets;
+    @ManyToMany
+    @JoinTable(
+            name = "users_trainings",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "training_id")
+    )
+    private Set<Training> trainings;
 }
