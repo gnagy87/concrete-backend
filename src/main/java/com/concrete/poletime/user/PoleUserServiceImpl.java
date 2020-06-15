@@ -1,6 +1,5 @@
 package com.concrete.poletime.user;
 
-import com.concrete.poletime.dto.AuthenticationResponseDTO;
 import com.concrete.poletime.dto.LoginRequestDTO;
 import com.concrete.poletime.dto.RegistrationRequestDTO;
 import com.concrete.poletime.dto.RegistrationResponseDTO;
@@ -44,11 +43,17 @@ public class PoleUserServiceImpl implements PoleUserService {
     }
 
     @Override
-    public void login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException {
+    public void login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException, ValidationException {
+        loginValidationHelper(logRequest.getEmail(), logRequest.getPassword());
         PoleUser foundUser = loadUserByEmail(logRequest.getEmail());
         if (!passwordEncoder.matches(logRequest.getPassword(), foundUser.getPassword())) {
             throw new LoginException("Password is not correct!");
         }
+    }
+
+    private void loginValidationHelper(String email, String password) throws ValidationException {
+        validation.emailValidation(email);
+        validation.passwordValidation(password);
     }
 
     @Override

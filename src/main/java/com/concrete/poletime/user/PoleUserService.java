@@ -13,6 +13,6 @@ import javax.security.auth.login.LoginException;
 public interface PoleUserService {
     boolean isExisted(String email);
     RegistrationResponseDTO registration(RegistrationRequestDTO regRequest) throws RegistrationException, ValidationException;
-    void login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException;
+    void login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException, ValidationException;
     PoleUser loadUserByEmail(String email) throws RecordNotFoundException;
 }

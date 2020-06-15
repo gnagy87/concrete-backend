@@ -42,7 +42,7 @@ public class UserControllerAPI {
         try {
             poleUserService.login(logRequest);
             return ResponseEntity.ok().body(authService.authentication(logRequest.getEmail()));
-        } catch (LoginException|RecordNotFoundException exc) {
+        } catch (LoginException|RecordNotFoundException|ValidationException exc) {
             throw new ResponseStatusException(
                     (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
                     exc.getMessage(),
