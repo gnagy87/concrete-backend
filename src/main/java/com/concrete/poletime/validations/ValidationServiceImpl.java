@@ -1,5 +1,6 @@
 package com.concrete.poletime.validations;
 
+import com.concrete.poletime.dto.RegistrationRequestDTO;
 import com.concrete.poletime.exceptions.ValidationException;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,13 @@ public class ValidationServiceImpl implements ValidationService {
         if (!name.matches("[a-zA-Z]{2,32}")) {
             throw new ValidationException("Name is not valid! Length must be in 2-20 characters and only letters are allowed!");
         }
+    }
+
+    @Override
+    public void userRegistrationValidator(RegistrationRequestDTO regRequest) throws ValidationException {
+        emailValidation(regRequest.getEmail());
+        nameValidation(regRequest.getFirstName());
+        nameValidation(regRequest.getLastName());
+        passwordValidation(regRequest.getPassword());
     }
 }

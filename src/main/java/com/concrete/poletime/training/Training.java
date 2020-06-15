@@ -7,6 +7,7 @@ import com.concrete.poletime.utils.TrainingType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -37,9 +38,8 @@ public class Training {
     private Long organizerId;
     @Column(name = "is_held")
     private boolean isHeld;
-    @Basic(optional = false)
-    @Column(name = "created_at", insertable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", updatable = false)
+    @CreationTimestamp
     private Date createdAt;
     @ManyToMany(mappedBy = "trainings")
     private Set<PoleUser> poleUsers;
