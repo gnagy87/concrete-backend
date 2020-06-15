@@ -6,9 +6,11 @@ import com.concrete.poletime.utils.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -34,9 +36,8 @@ public class PoleUser {
     private boolean isEnabled;
     @Column(name = "is_guest")
     private boolean isGuest;
-    @Basic(optional = false)
-    @Column(name = "created_at", insertable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", updatable = false)
+    @CreationTimestamp
     private Date createdAt;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "poleUser", fetch = FetchType.LAZY)
     private Set<SeasonTicket> seasonTickets;
@@ -47,4 +48,16 @@ public class PoleUser {
             inverseJoinColumns = @JoinColumn(name = "training_id")
     )
     private Set<Training> trainings;
+
+    public PoleUser(String email, String firstName, String lastName, String password) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.role = Role.GUEST;
+        this.isEnabled = false;
+        this.isGuest = false;
+        this.seasonTickets = new HashSet<>();
+        this.trainings = new HashSet<>();
+    }
 }

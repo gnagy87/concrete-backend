@@ -4,6 +4,7 @@ import com.concrete.poletime.user.PoleUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -25,9 +26,8 @@ public class SeasonTicket {
     private int amount;
     @Column(nullable = false, name = "seller_id")
     private Long sellerId;
-    @Basic(optional = false)
-    @Column(name = "created_at", insertable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", updatable = false)
+    @CreationTimestamp
     private Date createdAt;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
