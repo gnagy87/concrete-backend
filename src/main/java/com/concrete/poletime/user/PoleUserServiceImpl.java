@@ -1,13 +1,18 @@
 package com.concrete.poletime.user;
 
+import com.concrete.poletime.dto.AuthenticationResponseDTO;
+import com.concrete.poletime.dto.LoginRequestDTO;
 import com.concrete.poletime.dto.RegistrationRequestDTO;
 import com.concrete.poletime.dto.RegistrationResponseDTO;
+import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.RegistrationException;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.validations.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.security.auth.login.LoginException;
 
 @Service
 public class PoleUserServiceImpl implements PoleUserService {
@@ -36,5 +41,19 @@ public class PoleUserServiceImpl implements PoleUserService {
         }
         poleUserRepo.save(new PoleUser(regRequest.getEmail(), regRequest.getFirstName(), regRequest.getLastName(), passwordEncoder.encode(regRequest.getPassword())));
         return new RegistrationResponseDTO(200, "User is successfully registered", regRequest.getEmail());
+    }
+
+    @Override
+    public void login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException {
+        PoleUser foundUser = loadUserByEmail(logRequest.getEmail());
+        if (!passwordEncoder.matches(logRequest.getPassword(), foundUser.getPassword())) {
+            throw new LoginException("Password is not correct!");
+        }
+    }
+
+    @Override
+    public PoleUser loadUserByEmail(String email) throws RecordNotFoundException {
+        return poleUserRepo.findPoleUserByEmail(email)
+                .orElseThrow(() -> new RecordNotFoundException("User does not exist"));
     }
 }
