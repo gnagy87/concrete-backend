@@ -23,12 +23,13 @@ public class Training {
     private Date trainingFrom;
     @Column(nullable = false, name = "training_to")
     private Date trainingTo;
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private TrainingHall hall;
-    private int limit;
-    @Column(nullable = false)
+    @Column(name = "person_limit")
+    private int personLimit;
+    @Enumerated(EnumType.STRING)
     private TrainingType type;
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private TrainingLevel level;
     @Column(nullable = false, name = "organizer_id")
     private Long organizerId;
