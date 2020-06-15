@@ -1,11 +1,13 @@
 package com.concrete.poletime.controllers;
 
 import com.concrete.poletime.authentication.AuthenticationService;
+import com.concrete.poletime.dto.AuthenticationResponseDTO;
 import com.concrete.poletime.dto.LoginRequestDTO;
 import com.concrete.poletime.dto.RegistrationRequestDTO;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.RegistrationException;
 import com.concrete.poletime.exceptions.ValidationException;
+import com.concrete.poletime.jwt.JwtUtil;
 import com.concrete.poletime.user.PoleUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,7 +43,8 @@ public class UserControllerAPI {
     public ResponseEntity doLogin(@RequestBody LoginRequestDTO logRequest) {
         try {
             poleUserService.login(logRequest);
-            return ResponseEntity.ok().body(authService.authentication(logRequest.getEmail()));
+            AuthenticationResponseDTO auth = authService.authentication(logRequest.getEmail());
+            return ResponseEntity.ok().body(auth);
         } catch (LoginException|RecordNotFoundException|ValidationException exc) {
             throw new ResponseStatusException(
                     (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,

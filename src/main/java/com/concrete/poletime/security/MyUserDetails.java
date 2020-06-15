@@ -34,6 +34,10 @@ public class MyUserDetails implements UserDetails {
         return this.user.getPassword();
     }
 
+    public String getRole() {
+        return this.user.getRole().toString();
+    }
+
     @Override
     public String getUsername() {
         return null;
