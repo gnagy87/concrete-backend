@@ -7,11 +7,11 @@ import com.concrete.poletime.dto.RegistrationRequestDTO;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.RegistrationException;
 import com.concrete.poletime.exceptions.ValidationException;
-import com.concrete.poletime.jwt.JwtUtil;
 import com.concrete.poletime.user.PoleUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -51,6 +51,16 @@ public class UserControllerAPI {
                     exc.getMessage(),
                     exc
             );
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/withValidSeasonTicket")
+    public ResponseEntity getUsersWithValidSeasonTickets() {
+        try {
+            return ResponseEntity.ok().body(poleUserService.getUsersWithValidSeasonTicket());
+        } catch (Exception exc) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exc.getMessage(), exc);
         }
     }
 }

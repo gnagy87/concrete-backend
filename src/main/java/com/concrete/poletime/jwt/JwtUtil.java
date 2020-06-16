@@ -42,7 +42,6 @@ public class JwtUtil {
 
     public String generateToken(MyUserDetails userDetails) {
         Map<String, Object> claims = createClaims(userDetails);
-        claims.put("email", userDetails.getEmail());
         return createToken(claims);
     }
 
