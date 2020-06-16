@@ -12,10 +12,6 @@ import java.util.function.Function;
 
 public class JwtUtil {
 
-    public String extractEmail(String token) {
-        return extractAllClaims(token).get("email").toString();
-    }
-
     public Long extractUserId(String token) {
         return Long.parseLong(extractAllClaims(token).get("id").toString());
     }
@@ -47,7 +43,6 @@ public class JwtUtil {
 
     public Map createClaims(MyUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", userDetails.getEmail());
         claims.put("id", userDetails.getId());
         claims.put("role", userDetails.getRole());
         return claims;
@@ -62,7 +57,7 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, MyUserDetails userDetails) {
-        final String email = extractEmail(token);
-        return (email.equals(userDetails.getEmail()) && !isTokenExpired(token));
+        final Long userId = extractUserId(token);
+        return ((userId == userDetails.getId()) && !isTokenExpired(token));
     }
 }

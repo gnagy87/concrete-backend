@@ -19,8 +19,12 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        PoleUser user = poleUserRepo.findPoleUserByEmail(email)
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        return null;
+    }
+
+    public UserDetails loadUserById(Long userId) throws UsernameNotFoundException {
+        PoleUser user = poleUserRepo.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("user does not exist!"));
         return new MyUserDetails(user);
     }

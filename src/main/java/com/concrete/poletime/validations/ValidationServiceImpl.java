@@ -1,6 +1,6 @@
 package com.concrete.poletime.validations;
 
-import com.concrete.poletime.dto.RegistrationRequestDTO;
+import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.exceptions.ValidationException;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,7 @@ public class ValidationServiceImpl implements ValidationService {
     }
 
     @Override
-    public void userRegistrationValidator(RegistrationRequestDTO regRequest) throws ValidationException {
+    public void userRegistrationValidator(SetUserParamsDTO regRequest) throws ValidationException {
         emailValidation(regRequest.getEmail());
         nameValidation(regRequest.getFirstName());
         nameValidation(regRequest.getLastName());
