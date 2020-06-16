@@ -2,7 +2,7 @@ package com.concrete.poletime.user;
 
 import com.concrete.poletime.dto.LoginRequestDTO;
 import com.concrete.poletime.dto.PoleUserDTO;
-import com.concrete.poletime.dto.RegistrationRequestDTO;
+import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.dto.RegistrationResponseDTO;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.RegistrationException;
@@ -13,10 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
-import javax.swing.text.html.HTMLDocument;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PoleUserServiceImpl implements PoleUserService {
@@ -38,22 +36,23 @@ public class PoleUserServiceImpl implements PoleUserService {
     }
 
     @Override
-    public RegistrationResponseDTO registration(RegistrationRequestDTO regRequest) throws RegistrationException, ValidationException {
-        validation.userRegistrationValidator(regRequest);
-        if (isExisted(regRequest.getEmail())) {
-            throw new RegistrationException("User with email: " + regRequest.getEmail() + "has already been registered");
+    public RegistrationResponseDTO registration(SetUserParamsDTO userParams) throws RegistrationException, ValidationException {
+        validation.userRegistrationValidator(userParams);
+        if (isExisted(userParams.getEmail())) {
+            throw new RegistrationException("User with email: " + userParams.getEmail() + "has already been registered");
         }
-        poleUserRepo.save(new PoleUser(regRequest.getEmail(), regRequest.getFirstName(), regRequest.getLastName(), passwordEncoder.encode(regRequest.getPassword())));
-        return new RegistrationResponseDTO(200, "User is successfully registered", regRequest.getEmail());
+        poleUserRepo.save(new PoleUser(userParams.getEmail(), userParams.getFirstName(), userParams.getLastName(), passwordEncoder.encode(userParams.getPassword())));
+        return new RegistrationResponseDTO(200, "User is successfully registered", userParams.getEmail());
     }
 
     @Override
-    public void login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException, ValidationException {
+    public Long login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException, ValidationException {
         loginValidationHelper(logRequest.getEmail(), logRequest.getPassword());
         PoleUser foundUser = loadUserByEmail(logRequest.getEmail());
         if (!passwordEncoder.matches(logRequest.getPassword(), foundUser.getPassword())) {
             throw new LoginException("Password is not correct!");
         }
+        return foundUser.getId();
     }
 
     private void loginValidationHelper(String email, String password) throws ValidationException {
@@ -74,5 +73,50 @@ public class PoleUserServiceImpl implements PoleUserService {
                 poleUser -> poleUserDTOS.add(new PoleUserDTO(poleUser))
         );
         return poleUserDTOS;
+    }
+
+    @Override
+    public PoleUser loadUserById(Long id) throws RecordNotFoundException {
+        return poleUserRepo.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("User does not exist"));
+    }
+
+    @Override
+    public PoleUserDTO updateRecords(PoleUser user, SetUserParamsDTO userParams) throws ValidationException {
+        updateEmail(user, userParams.getEmail());
+        updateName(user, userParams.getFirstName(), true);
+        updateName(user, userParams.getLastName(), false);
+        updatePassword(user, userParams.getPassword());
+        poleUserRepo.save(user);
+        return new PoleUserDTO(user);
+
+    }
+
+    private PoleUser updateEmail(PoleUser user, String email) throws ValidationException {
+        if (email != null) {
+            validation.emailValidation(email);
+            user.setEmail(email);
+        }
+        return user;
+    }
+
+    private PoleUser updateName(PoleUser user, String name, boolean isFirstName) throws ValidationException {
+        if (name != null) {
+            validation.nameValidation(name);
+            if (isFirstName) {
+                user.setFirstName(name);
+            } else {
+                user.setLastName(name);
+            }
+        }
+        return user;
+    }
+
+    private PoleUser updatePassword(PoleUser user, String password) throws ValidationException {
+        if (password != null) {
+            validation.passwordValidation(password);
+            user.setPassword(password);
+        }
+        return user;
     }
 }
