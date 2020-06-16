@@ -1,7 +1,7 @@
 package com.concrete.poletime.user;
 
-import com.concrete.poletime.dto.AuthenticationResponseDTO;
 import com.concrete.poletime.dto.LoginRequestDTO;
+import com.concrete.poletime.dto.PoleUserDTO;
 import com.concrete.poletime.dto.RegistrationRequestDTO;
 import com.concrete.poletime.dto.RegistrationResponseDTO;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
@@ -13,6 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
+import javax.swing.text.html.HTMLDocument;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PoleUserServiceImpl implements PoleUserService {
@@ -44,16 +48,31 @@ public class PoleUserServiceImpl implements PoleUserService {
     }
 
     @Override
-    public void login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException {
+    public void login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException, ValidationException {
+        loginValidationHelper(logRequest.getEmail(), logRequest.getPassword());
         PoleUser foundUser = loadUserByEmail(logRequest.getEmail());
         if (!passwordEncoder.matches(logRequest.getPassword(), foundUser.getPassword())) {
             throw new LoginException("Password is not correct!");
         }
     }
 
+    private void loginValidationHelper(String email, String password) throws ValidationException {
+        validation.emailValidation(email);
+        validation.passwordValidation(password);
+    }
+
     @Override
     public PoleUser loadUserByEmail(String email) throws RecordNotFoundException {
         return poleUserRepo.findPoleUserByEmail(email)
                 .orElseThrow(() -> new RecordNotFoundException("User does not exist"));
+    }
+
+    @Override
+    public List getUsersWithValidSeasonTicket() {
+        List<PoleUserDTO> poleUserDTOS = new ArrayList<>();
+        poleUserRepo.findPoleUsersWithValidSeasonTicket().forEach(
+                poleUser -> poleUserDTOS.add(new PoleUserDTO(poleUser))
+        );
+        return poleUserDTOS;
     }
 }

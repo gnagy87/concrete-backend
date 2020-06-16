@@ -13,11 +13,15 @@ import java.util.function.Function;
 public class JwtUtil {
 
     public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractAllClaims(token).get("email").toString();
     }
 
-    public String extractUserId(String token) {
-        return extractClaim(token, Claims::getId);
+    public Long extractUserId(String token) {
+        return Long.parseLong(extractAllClaims(token).get("id").toString());
+    }
+
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role").toString();
     }
 
     public Date extractExpiration(String token) {
@@ -37,14 +41,22 @@ public class JwtUtil {
     }
 
     public String generateToken(MyUserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getEmail(), userDetails.getId().toString());
+        Map<String, Object> claims = createClaims(userDetails);
+        return createToken(claims);
     }
 
-    private String createToken(Map<String, Object> claims, String email, String userId) {
+    public Map createClaims(MyUserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", userDetails.getEmail());
+        claims.put("id", userDetails.getId());
+        claims.put("role", userDetails.getRole());
+        return claims;
+    }
 
-        return Jwts.builder().setClaims(claims).setSubject(email).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setId(userId)
+    private String createToken(Map<String, Object> claims) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION))
                 .signWith(SignatureAlgorithm.HS256, JwtProperties.SECRET_KEY).compact();
     }

@@ -1,6 +1,7 @@
 package com.concrete.poletime.controllers;
 
 import com.concrete.poletime.authentication.AuthenticationService;
+import com.concrete.poletime.dto.AuthenticationResponseDTO;
 import com.concrete.poletime.dto.LoginRequestDTO;
 import com.concrete.poletime.dto.RegistrationRequestDTO;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
@@ -10,6 +11,7 @@ import com.concrete.poletime.user.PoleUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -41,13 +43,24 @@ public class UserControllerAPI {
     public ResponseEntity doLogin(@RequestBody LoginRequestDTO logRequest) {
         try {
             poleUserService.login(logRequest);
-            return ResponseEntity.ok().body(authService.authentication(logRequest.getEmail()));
-        } catch (LoginException|RecordNotFoundException exc) {
+            AuthenticationResponseDTO auth = authService.authentication(logRequest.getEmail());
+            return ResponseEntity.ok().body(auth);
+        } catch (LoginException|RecordNotFoundException|ValidationException exc) {
             throw new ResponseStatusException(
                     (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
                     exc.getMessage(),
                     exc
             );
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/withValidSeasonTicket")
+    public ResponseEntity getUsersWithValidSeasonTickets() {
+        try {
+            return ResponseEntity.ok().body(poleUserService.getUsersWithValidSeasonTicket());
+        } catch (Exception exc) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exc.getMessage(), exc);
         }
     }
 }
