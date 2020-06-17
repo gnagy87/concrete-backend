@@ -16,8 +16,19 @@ public class ValidationServiceImpl implements ValidationService {
 
     @Override
     public void passwordValidation(String password) throws ValidationException {
-        if (!password.matches("[-a-zA-Z0-9!?._+]{6,16}")) {
-            throw new ValidationException("Password is not valid! Length must be in 6-16 characters and [-a-zA-Z0-9!?._+] characters are allowed!");
+        String regex = "^(?=.*[0-9]{2})"
+                + "(?=.*[a-z])(?=.*[A-Z])"
+                + "(?=.*[@#$%^&+=])"
+                + "(?=\\S+$).{8,20}$";
+
+        if (!password.matches(regex)) {
+            throw new ValidationException("Password is not valid! " +
+                    "Password must contain at least 2 digits, " +
+                    "and minimum one lowercase alphabet, " +
+                    "and minimum one uppercase alphabet," +
+                    "and minimum one of following special characters: @#$%^&+= " +
+                    "while spaces are not allowed, " +
+                    "and password length is minimum 8 but maximum 20 characters long.");
         }
     }
 
