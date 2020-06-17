@@ -1,9 +1,11 @@
 package com.concrete.poletime.controllers;
 
 import com.concrete.poletime.authentication.AuthenticationService;
-import com.concrete.poletime.dto.AuthenticationResponseDTO;
-import com.concrete.poletime.dto.LoginRequestDTO;
-import com.concrete.poletime.dto.SetUserParamsDTO;
+import com.concrete.poletime.dto.*;
+import com.concrete.poletime.email.ConfirmationToken;
+import com.concrete.poletime.email.ConfirmationTokenService;
+import com.concrete.poletime.email.EmailSenderService;
+import com.concrete.poletime.exceptions.ConfirmationException;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.RegistrationException;
 import com.concrete.poletime.exceptions.ValidationException;
@@ -25,19 +27,44 @@ public class UserControllerAPI {
 
     private PoleUserService poleUserService;
     private AuthenticationService authService;
+    private ConfirmationTokenService confirmationTokenService;
+    private EmailSenderService emailSenderService;
 
     @Autowired
-    public UserControllerAPI(PoleUserService poleUserService, AuthenticationService authService) {
+    public UserControllerAPI(PoleUserService poleUserService,
+                             AuthenticationService authService,
+                             ConfirmationTokenService confirmationTokenService,
+                             EmailSenderService emailSenderService) {
         this.poleUserService = poleUserService;
         this.authService = authService;
+        this.confirmationTokenService = confirmationTokenService;
+        this.emailSenderService = emailSenderService;
     }
 
     @PostMapping("/registration")
     public ResponseEntity doRegistration(@RequestBody SetUserParamsDTO userParams) {
         try {
-            return ResponseEntity.ok().body(poleUserService.registration(userParams));
-        } catch (RegistrationException|ValidationException exc) {
+            PoleUser newUser = poleUserService.registration(userParams);
+            ConfirmationToken confirmationToken = confirmationTokenService.setConfirmationTokenToUser(newUser);
+            emailSenderService.setConfirmationEmail(newUser, confirmationToken);
+            return ResponseEntity.ok().body(new UserStatusDTO(200, "User is registered successfully", newUser.getEmail()));
+        } catch (RegistrationException|ValidationException|ConfirmationException exc) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exc.getMessage(), exc);
+        }
+    }
+
+    @GetMapping("/confirm-account")
+    public ResponseEntity confirmRegistration(@RequestParam("token")String confirmationToken) {
+        try {
+            ConfirmationToken token = confirmationTokenService.loadConfirmationToken(confirmationToken);
+            String email = poleUserService.confirmUser(token);
+            return ResponseEntity.ok().body(new UserStatusDTO(200, "Account verified", email));
+        } catch (RecordNotFoundException|ConfirmationException exc) {
+            throw new ResponseStatusException(
+                    (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
+                    exc.getMessage(),
+                    exc
+            );
         }
     }
 
@@ -47,7 +74,25 @@ public class UserControllerAPI {
             Long userId = poleUserService.login(logRequest);
             AuthenticationResponseDTO auth = authService.authentication(userId);
             return ResponseEntity.ok().body(auth);
+        } catch (ConfirmationException exc) {
+            return ResponseEntity.badRequest().body(new UserStatusDTO(400, exc.getMessage(), logRequest.getEmail()));
         } catch (LoginException|RecordNotFoundException|ValidationException exc) {
+            throw new ResponseStatusException(
+                    (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
+                    exc.getMessage(),
+                    exc
+            );
+        }
+    }
+
+    @GetMapping("/resend-confirm-token")
+    public ResponseEntity resendConfirmationToken(@RequestParam("email")String email) {
+        try {
+            PoleUser user = poleUserService.loadUserByEmail(email);
+            ConfirmationToken confirmationToken = confirmationTokenService.getConfirmationTokenToResend(user);
+            emailSenderService.setConfirmationEmail(user, confirmationToken);
+            return ResponseEntity.ok().body(new UserStatusDTO(200, "Confirmation email sent", email));
+        } catch (RecordNotFoundException|ConfirmationException exc) {
             throw new ResponseStatusException(
                     (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
                     exc.getMessage(),

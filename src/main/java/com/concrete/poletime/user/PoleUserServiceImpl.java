@@ -3,7 +3,9 @@ package com.concrete.poletime.user;
 import com.concrete.poletime.dto.LoginRequestDTO;
 import com.concrete.poletime.dto.PoleUserDTO;
 import com.concrete.poletime.dto.SetUserParamsDTO;
-import com.concrete.poletime.dto.RegistrationResponseDTO;
+import com.concrete.poletime.email.ConfirmationToken;
+import com.concrete.poletime.email.ConfirmationTokenService;
+import com.concrete.poletime.exceptions.ConfirmationException;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.RegistrationException;
 import com.concrete.poletime.exceptions.ValidationException;
@@ -36,22 +38,24 @@ public class PoleUserServiceImpl implements PoleUserService {
     }
 
     @Override
-    public RegistrationResponseDTO registration(SetUserParamsDTO userParams) throws RegistrationException, ValidationException {
+    public PoleUser registration(SetUserParamsDTO userParams) throws RegistrationException, ValidationException {
         validation.userRegistrationValidator(userParams);
         if (isExisted(userParams.getEmail())) {
-            throw new RegistrationException("User with email: " + userParams.getEmail() + "has already been registered");
+            throw new RegistrationException("User with email: " + userParams.getEmail() + " has already been registered");
         }
-        poleUserRepo.save(new PoleUser(userParams.getEmail(), userParams.getFirstName(), userParams.getLastName(), passwordEncoder.encode(userParams.getPassword())));
-        return new RegistrationResponseDTO(200, "User is successfully registered", userParams.getEmail());
+        PoleUser newUser = new PoleUser(userParams.getEmail(), userParams.getFirstName(), userParams.getLastName(), passwordEncoder.encode(userParams.getPassword()));
+        poleUserRepo.save(newUser);
+        return newUser;
     }
 
     @Override
-    public Long login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException, ValidationException {
+    public Long login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException, ValidationException, ConfirmationException {
         loginValidationHelper(logRequest.getEmail(), logRequest.getPassword());
         PoleUser foundUser = loadUserByEmail(logRequest.getEmail());
         if (!passwordEncoder.matches(logRequest.getPassword(), foundUser.getPassword())) {
             throw new LoginException("Password is not correct!");
         }
+        if (!foundUser.isEnabled()) throw new ConfirmationException("User has not verified yet!");
         return foundUser.getId();
     }
 
@@ -89,7 +93,15 @@ public class PoleUserServiceImpl implements PoleUserService {
         updatePassword(user, userParams.getPassword());
         poleUserRepo.save(user);
         return new PoleUserDTO(user);
+    }
 
+    @Override
+    public String confirmUser(ConfirmationToken confirmationToken) throws RecordNotFoundException, ConfirmationException {
+        PoleUser userToConfirm = loadUserById(confirmationToken.getUser().getId());
+        if (userToConfirm.isEnabled()) throw new ConfirmationException("User has already been verified");
+        userToConfirm.setEnabled(true);
+        poleUserRepo.save(userToConfirm);
+        return userToConfirm.getEmail();
     }
 
     private PoleUser updateEmail(PoleUser user, String email) throws ValidationException {
@@ -115,7 +127,7 @@ public class PoleUserServiceImpl implements PoleUserService {
     private PoleUser updatePassword(PoleUser user, String password) throws ValidationException {
         if (password != null) {
             validation.passwordValidation(password);
-            user.setPassword(password);
+            user.setPassword(passwordEncoder.encode(password));
         }
         return user;
     }
