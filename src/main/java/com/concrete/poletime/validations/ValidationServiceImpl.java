@@ -26,7 +26,7 @@ public class ValidationServiceImpl implements ValidationService {
                     "Password must contain at least 2 digits, " +
                     "and minimum one lowercase alphabet, " +
                     "and minimum one uppercase alphabet," +
-                    "and minimum one of following special characters: @#$%^&+=" +
+                    "and minimum one of following special characters: @#$%^&+= " +
                     "while spaces are not allowed, " +
                     "and password length is minimum 8 but maximum 20 characters long.");
         }
