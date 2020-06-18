@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
@@ -54,18 +55,20 @@ public class DbInit implements CommandLineRunner {
             SeasonTicket seasonTicket = new SeasonTicket();
             seasonTicket.setAmount(20);
             seasonTicket.setSellerId(admin.getId());
-            Date date = new Date();
-            seasonTicket.setValidFrom(date);
-            Calendar c = Calendar.getInstance();
-            c.setTime(date);
-            c.add(Calendar.DATE, 30);
-            date = c.getTime();
-            seasonTicket.setValidTo(date);
+            seasonTicket.setValidFrom(LocalDate.now());
+            seasonTicket.setValidTo(seasonTicket.getValidFrom().plusDays(30));
             Set<SeasonTicket> seasonTickets = guest.getSeasonTickets();
             seasonTickets.add(seasonTicket);
             guest.setSeasonTickets(seasonTickets);
             seasonTicket.setPoleUser(guest);
             poleUserRepo.save(guest);
         }
+        PoleUser guest = new PoleUser(
+                "pole_user" + 21 + "@concrete.hu",
+                "firstName" + 21,
+                "lastName" + 21,
+                passwordEncoder.encode("aA@123456"));
+        guest.setEnabled(true);
+        poleUserRepo.save(guest);
     }
 }

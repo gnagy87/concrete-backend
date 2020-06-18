@@ -6,7 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
@@ -14,25 +15,27 @@ import java.util.Set;
 @NoArgsConstructor
 public class SeasonTicketDTO {
     private Long id;
-    private Date validFrom;
-    private Date validTo;
+    private LocalDate validFrom;
+    private LocalDate validTo;
     private int amount;
     private Long userId;
     private Long sellerId;
 
     public SeasonTicketDTO(PoleUser poleUser) {
-        SeasonTicket currentSeasonTicket = validSeasonTicket(poleUser.getSeasonTickets());
-        this.id = currentSeasonTicket.getId();
-        this.validFrom = currentSeasonTicket.getValidFrom();
-        this.validTo = currentSeasonTicket.getValidTo();
-        this.amount = currentSeasonTicket.getAmount();
-        this.userId = currentSeasonTicket.getPoleUser().getId();
-        this.sellerId = currentSeasonTicket.getSellerId();
+        Optional<SeasonTicket> currentSeasonTicket = validSeasonTicket(poleUser.getSeasonTickets());
+        if (currentSeasonTicket.isPresent()) {
+            this.id = currentSeasonTicket.get().getId();
+            this.validFrom = currentSeasonTicket.get().getValidFrom();
+            this.validTo = currentSeasonTicket.get().getValidTo();
+            this.amount = currentSeasonTicket.get().getAmount();
+            this.userId = currentSeasonTicket.get().getPoleUser().getId();
+            this.sellerId = currentSeasonTicket.get().getSellerId();
+        }
     }
 
-    private SeasonTicket validSeasonTicket(Set<SeasonTicket> seasonTickets) {
+    private Optional<SeasonTicket> validSeasonTicket(Set<SeasonTicket> seasonTickets) {
         return seasonTickets.stream()
-                .filter(seasonTicket -> seasonTicket.getValidTo().equals(new Date()) || seasonTicket.getValidTo().after(new Date()))
-                .findFirst().get();
+                .filter(seasonTicket -> seasonTicket.getValidTo().equals(LocalDate.now()) || seasonTicket.getValidTo().isAfter(LocalDate.now()))
+                .findFirst();
     }
 }

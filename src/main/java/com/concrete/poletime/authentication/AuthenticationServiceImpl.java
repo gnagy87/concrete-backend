@@ -44,4 +44,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public String getToken(HttpServletRequest request) {
         return request.getHeader("Authorization").substring(7);
     }
+
+    @Override
+    public Long getUserIdFromToken(HttpServletRequest request) {
+        return jwtTokenUtil.extractUserId(getToken(request));
+    }
 }

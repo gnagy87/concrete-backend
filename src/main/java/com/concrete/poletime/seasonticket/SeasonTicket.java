@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -19,9 +20,9 @@ public class SeasonTicket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, name = "valid_from")
-    private Date validFrom;
+    private LocalDate validFrom;
     @Column(nullable = false, name = "valid_to")
-    private Date validTo;
+    private LocalDate validTo;
     @Column(nullable = false)
     private int amount;
     @Column(nullable = false, name = "seller_id")
@@ -32,4 +33,12 @@ public class SeasonTicket {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private PoleUser poleUser;
+
+    public SeasonTicket(LocalDate validFrom, LocalDate validTo, int amount, Long sellerId, PoleUser poleUser) {
+        this.validFrom = validFrom;
+        this.validTo = validTo;
+        this.amount = amount;
+        this.sellerId = sellerId;
+        this.poleUser = poleUser;
+    }
 }

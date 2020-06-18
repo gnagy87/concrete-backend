@@ -10,4 +10,5 @@ public interface AuthenticationService {
     AuthenticationResponseDTO authentication(Long userId);
     PoleUser currentUser(HttpServletRequest request) throws RecordNotFoundException;
     String getToken(HttpServletRequest request);
+    Long getUserIdFromToken(HttpServletRequest request);
 }
