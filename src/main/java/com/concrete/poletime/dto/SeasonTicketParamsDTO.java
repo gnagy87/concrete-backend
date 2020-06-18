@@ -13,5 +13,4 @@ public class SeasonTicketParamsDTO {
     private String email;
     private String validFrom;
     private int amount;
-    private int validityDays;
 }

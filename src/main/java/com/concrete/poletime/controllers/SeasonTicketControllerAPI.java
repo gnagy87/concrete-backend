@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +41,20 @@ public class SeasonTicketControllerAPI {
             PoleUser poleUser = poleUserService.loadUserByEmail(seasonTicketParams.getEmail());
             return ResponseEntity.ok().body(seasonTicketService.createSeasonTicket(seasonTicketParams, sellerId, poleUser));
         } catch (RecordNotFoundException| ValidationException| SeasonTicketException exc) {
+            throw new ResponseStatusException(
+                    (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
+                    exc.getMessage(),
+                    exc
+            );
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/update")
+    public ResponseEntity updateSeasonTicket(@RequestParam("seasonTicketId")Long seasonTicketId, @RequestBody SeasonTicketParamsDTO seasonTicketParams) {
+        try {
+            return ResponseEntity.ok().body(seasonTicketService.updateSeasonTicket(seasonTicketId, seasonTicketParams));
+        } catch (SeasonTicketException|ValidationException|RecordNotFoundException exc) {
             throw new ResponseStatusException(
                     (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
                     exc.getMessage(),

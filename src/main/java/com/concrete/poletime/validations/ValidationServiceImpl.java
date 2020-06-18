@@ -3,10 +3,7 @@ package com.concrete.poletime.validations;
 import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.exceptions.ValidationException;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.Date;
+import java.util.Arrays;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
@@ -55,6 +52,13 @@ public class ValidationServiceImpl implements ValidationService {
     public void validityDateValidator(String validityDate) throws ValidationException {
         if (!validityDate.matches("^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$")) {
             throw new ValidationException("Validity date is not accepted! Correct format: YYYY-MM-DD");
+        }
+    }
+
+    @Override
+    public void amountValidator(int amount) throws ValidationException {
+        if (!Arrays.asList(5, 10, 15, 20).contains(amount)) {
+            throw new ValidationException("Amount must be: 5 / 10 / 15 / 20");
         }
     }
 }
