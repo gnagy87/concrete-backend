@@ -30,7 +30,7 @@ public class DbInit implements CommandLineRunner {
                 "admin@concrete.hu",
                 "admin",
                 "admin",
-                passwordEncoder.encode("123456"));
+                passwordEncoder.encode("aA@123456"));
         admin.setEnabled(true);
         admin.setRole(Role.ADMIN);
         poleUserRepo.save(admin);
@@ -39,7 +39,7 @@ public class DbInit implements CommandLineRunner {
                 "trainer@concrete.hu",
                 "trainer",
                 "trainer",
-                passwordEncoder.encode("123456"));
+                passwordEncoder.encode("aA@123456"));
         trainer.setEnabled(true);
         trainer.setRole(Role.TRAINER);
         poleUserRepo.save(trainer);
@@ -49,7 +49,7 @@ public class DbInit implements CommandLineRunner {
                     "pole_user" + (i + 1) + "@concrete.hu",
                     "firstName" + (i + 1),
                     "lastName" + (i + 1),
-                    passwordEncoder.encode("123456"));
+                    passwordEncoder.encode("aA@123456"));
             guest.setEnabled(true);
             SeasonTicket seasonTicket = new SeasonTicket();
             seasonTicket.setAmount(20);

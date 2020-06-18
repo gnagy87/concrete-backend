@@ -15,6 +15,7 @@ public class PoleUserDTO {
     private String firsName;
     private String lastName;
     private Role role;
+    private SeasonTicketDTO currentSeasonTicket;
 
     public PoleUserDTO(PoleUser poleUser) {
         this.id = poleUser.getId();
@@ -22,5 +23,6 @@ public class PoleUserDTO {
         this.firsName = poleUser.getFirstName();
         this.lastName = poleUser.getLastName();
         this.role = poleUser.getRole();
+        this.currentSeasonTicket = new SeasonTicketDTO(poleUser);
     }
 }
