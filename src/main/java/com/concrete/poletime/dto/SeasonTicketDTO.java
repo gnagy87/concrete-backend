@@ -33,6 +33,15 @@ public class SeasonTicketDTO {
         }
     }
 
+    public SeasonTicketDTO(SeasonTicket seasonTicket) {
+        this.id = seasonTicket.getId();
+        this.validFrom = seasonTicket.getValidFrom();
+        this.validTo = seasonTicket.getValidTo();
+        this.amount = seasonTicket.getAmount();
+        this.userId = seasonTicket.getPoleUser().getId();
+        this.sellerId = seasonTicket.getSellerId();
+    }
+
     private Optional<SeasonTicket> validSeasonTicket(Set<SeasonTicket> seasonTickets) {
         return seasonTickets.stream()
                 .filter(seasonTicket -> seasonTicket.getValidTo().equals(LocalDate.now()) || seasonTicket.getValidTo().isAfter(LocalDate.now()))
