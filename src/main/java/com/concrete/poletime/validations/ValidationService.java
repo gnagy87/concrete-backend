@@ -8,4 +8,5 @@ public interface ValidationService {
     void passwordValidation(String password) throws ValidationException;
     void nameValidation(String name) throws ValidationException;
     void userRegistrationValidator(SetUserParamsDTO regRequest) throws ValidationException;
+    void validityDateValidator(String validityDate) throws ValidationException;
 }

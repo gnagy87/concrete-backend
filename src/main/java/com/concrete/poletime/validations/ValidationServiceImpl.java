@@ -4,6 +4,10 @@ import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.exceptions.ValidationException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
+
 @Service
 public class ValidationServiceImpl implements ValidationService {
 
@@ -45,5 +49,12 @@ public class ValidationServiceImpl implements ValidationService {
         nameValidation(regRequest.getFirstName());
         nameValidation(regRequest.getLastName());
         passwordValidation(regRequest.getPassword());
+    }
+
+    @Override
+    public void validityDateValidator(String validityDate) throws ValidationException {
+        if (!validityDate.matches("^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$")) {
+            throw new ValidationException("Validity date is not accepted! Correct format: YYYY-MM-DD");
+        }
     }
 }
