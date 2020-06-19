@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -43,4 +44,16 @@ public class Training {
     private Date createdAt;
     @ManyToMany(mappedBy = "trainings")
     private Set<PoleUser> poleUsers;
+
+    public Training(Date trainingFrom, Date trainingTo, TrainingHall hall, int personLimit, TrainingType type, TrainingLevel level, Long organizerId) {
+        this.trainingFrom = trainingFrom;
+        this.trainingTo = trainingTo;
+        this.hall = hall;
+        this.personLimit = personLimit;
+        this.type = type;
+        this.level = level;
+        this.organizerId = organizerId;
+        this.isHeld = false;
+        this.poleUsers = new HashSet<>();
+    }
 }

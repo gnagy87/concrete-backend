@@ -2,6 +2,10 @@ package com.concrete.poletime.validations;
 
 import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.exceptions.ValidationException;
+import com.concrete.poletime.training.Training;
+import com.concrete.poletime.utils.TrainingHall;
+import com.concrete.poletime.utils.TrainingLevel;
+import com.concrete.poletime.utils.TrainingType;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
 
@@ -60,5 +64,36 @@ public class ValidationServiceImpl implements ValidationService {
         if (!Arrays.asList(5, 10, 15, 20).contains(amount)) {
             throw new ValidationException("Amount must be: 5 / 10 / 15 / 20");
         }
+    }
+
+    @Override
+    public void trainingDateValidator(String date) throws ValidationException {
+        if (!date.matches("[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):(00|15|30|45)")) {
+            throw new ValidationException("Date is not accepted! Correct format: YYYY-MM-DD HH:mm | minutes can only be in '00', '15', '30', '45'");
+        }
+    }
+
+    @Override
+    public boolean trainingHallValidator(String hall) {
+        return Arrays.stream(TrainingHall.values())
+                .filter(trainingHall -> hall.toUpperCase().equals(trainingHall.toString()))
+                .findFirst()
+                .isPresent();
+    }
+
+    @Override
+    public boolean trainingTypeValidator(String type) {
+        return Arrays.stream(TrainingType.values())
+                .filter(trainingType -> type.toUpperCase().equals(trainingType.toString()))
+                .findFirst()
+                .isPresent();
+    }
+
+    @Override
+    public boolean trainingLevelValidator(String level) {
+        return Arrays.stream(TrainingLevel.values())
+                .filter(trainingLevel -> level.toUpperCase().equals(trainingLevel.toString()))
+                .findFirst()
+                .isPresent();
     }
 }
