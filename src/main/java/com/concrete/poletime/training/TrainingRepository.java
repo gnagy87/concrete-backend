@@ -13,7 +13,7 @@ public interface TrainingRepository extends CrudRepository<Training, Long> {
             value = "SELECT * FROM trainings " +
                     "WHERE hall = ?1 AND " +
                     "((training_to > ?2 AND training_to <= ?3) OR " +
-                    "(training_from >= ?2 AND training_from <= ?3) OR" +
+                    "(training_from >= ?2 AND training_from < ?3) OR " +
                     "(training_from <= ?2 AND training_to >= ?3)) " +
                     "LIMIT 1",
             nativeQuery = true
