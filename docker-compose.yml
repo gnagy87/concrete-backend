@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  mysql-container:
+    image: mysql:latest
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=poledb
+      - MYSQL_USER=daniel
+      - MYSQL_PASSWORD=123456
+    volumes:
+          - mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  concrete-test-container:
+    image: concrete-test-app:latest
+    ports:
+      - "8086:8080"
+    environment:
+      - DATASOURCE_URL=jdbc:mysql://mysql-container:3307/poledb?serverTimezone=Europe/Budapest
+      - DATASOURCE_USERNAME=daniel
+      - DATASOURCE_PASSWORD=123456
+    depends_on:
+      - mysql-container
+
+volumes:
+  mysql_data:
