@@ -1,6 +1,5 @@
 package com.concrete.poletime.email;
 
-import com.concrete.poletime.user.PoleUser;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

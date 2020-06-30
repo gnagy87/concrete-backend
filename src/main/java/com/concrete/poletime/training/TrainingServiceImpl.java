@@ -81,5 +81,4 @@ public class TrainingServiceImpl implements TrainingService {
     private boolean isTrainingAccepted(String hall, Date trainingFrom, Date trainingTo) {
         return trainingRepo.findTrainingInSameTime(hall, trainingFrom, trainingTo).isPresent();
     }
-
 }

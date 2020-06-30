@@ -1,8 +1,5 @@
 package com.concrete.poletime.dto;
 
-import com.concrete.poletime.utils.TrainingHall;
-import com.concrete.poletime.utils.TrainingLevel;
-import com.concrete.poletime.utils.TrainingType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

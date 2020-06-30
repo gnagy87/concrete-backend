@@ -4,7 +4,6 @@ import com.concrete.poletime.dto.LoginRequestDTO;
 import com.concrete.poletime.dto.PoleUserDTO;
 import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.email.ConfirmationToken;
-import com.concrete.poletime.email.ConfirmationTokenService;
 import com.concrete.poletime.exceptions.ConfirmationException;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.RegistrationException;
