@@ -1,9 +1,11 @@
 package com.concrete.poletime.jwt;
 
 import com.concrete.poletime.security.MyUserDetails;
+import com.concrete.poletime.utils.ApplicationProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +13,13 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class JwtUtil {
+
+    private ApplicationProperties properties;
+
+    @Autowired
+    public JwtUtil(ApplicationProperties properties) {
+        this.properties = properties;
+    }
 
     public Long extractUserId(String token) {
         return Long.parseLong(extractAllClaims(token).get("id").toString());
@@ -29,7 +38,7 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(JwtProperties.SECRET_KEY).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(properties.getJwtSecretKey()).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -52,8 +61,8 @@ public class JwtUtil {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION))
-                .signWith(SignatureAlgorithm.HS256, JwtProperties.SECRET_KEY).compact();
+                .setExpiration(new Date(System.currentTimeMillis() + properties.getJwtExpiration()))
+                .signWith(SignatureAlgorithm.HS256, properties.getJwtSecretKey()).compact();
     }
 
     public Boolean validateToken(String token, MyUserDetails userDetails) {

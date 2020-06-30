@@ -41,8 +41,6 @@ public class AppLoggerInterceptor extends HandlerInterceptorAdapter {
         return true;
     }
 
-
-
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         LOGGER.info("RESPONSE: " + response.getStatus());

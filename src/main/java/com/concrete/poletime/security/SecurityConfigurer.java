@@ -2,6 +2,7 @@ package com.concrete.poletime.security;
 
 import com.concrete.poletime.jwt.JwtRequestFilter;
 import com.concrete.poletime.jwt.JwtUtil;
+import com.concrete.poletime.utils.ApplicationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,11 +23,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     private MyUserDetailsService myUserDetailsService;
     private JwtRequestFilter jwtRequestFilter;
+    private ApplicationProperties properties;
 
     @Autowired
-    public SecurityConfigurer(MyUserDetailsService myUserDetailsService, JwtRequestFilter jwtRequestFilter) {
+    public SecurityConfigurer(MyUserDetailsService myUserDetailsService, JwtRequestFilter jwtRequestFilter, ApplicationProperties properties) {
         this.myUserDetailsService = myUserDetailsService;
         this.jwtRequestFilter = jwtRequestFilter;
+        this.properties = properties;
     }
 
     @Override
@@ -52,7 +55,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Bean
     public JwtUtil jwtTokenUtil() {
-        return new JwtUtil();
+        return new JwtUtil(properties);
     }
 
     @Bean

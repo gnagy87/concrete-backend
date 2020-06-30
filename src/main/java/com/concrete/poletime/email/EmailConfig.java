@@ -1,5 +1,7 @@
 package com.concrete.poletime.email;
 
+import com.concrete.poletime.utils.ApplicationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,18 +16,25 @@ import java.util.Properties;
 @ComponentScan(basePackages = "com.concrete.poletime")
 public class EmailConfig {
 
+    private ApplicationProperties properties;
+
+    @Autowired
+    public EmailConfig(ApplicationProperties properties) {
+        this.properties = properties;
+    }
+
     @Bean(name = "mailSender")
     public MailSender javaMailService() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-        javaMailSender.setHost("smtp.gmail.com");
-        javaMailSender.setPort(587);
+        javaMailSender.setHost(properties.getMailSenderHost());
+        javaMailSender.setPort(properties.getMailSenderPort());
         javaMailSender.setProtocol("smtp");
-        javaMailSender.setUsername("polestudioconcrete@gmail.com");
-        javaMailSender.setPassword("poleconcrete2020");
+        javaMailSender.setUsername(properties.getMailSenderUsername());
+        javaMailSender.setPassword(properties.getMailSenderPassword());
         Properties mailProperties = new Properties();
         mailProperties.put("mail.smtp.auth", "true");
         mailProperties.put("mail.smtp.starttls.enable", "true");
-        mailProperties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        mailProperties.put("mail.smtp.ssl.trust", properties.getMailSenderHost());
         mailProperties.put("mail.smtp.debug", "true");
         javaMailSender.setJavaMailProperties(mailProperties);
         return javaMailSender;
