@@ -5,7 +5,6 @@ import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.NoTrainingRepresentedException;
 import com.concrete.poletime.exceptions.TrainingException;
 import com.concrete.poletime.exceptions.ValidationException;
-import com.concrete.poletime.seasonticket.SeasonTicket;
 import com.concrete.poletime.user.PoleUser;
 import com.concrete.poletime.user.PoleUserService;
 import com.concrete.poletime.utils.Role;
@@ -42,13 +41,7 @@ public class TrainingServiceImpl implements TrainingService {
   public TrainingDTO createTraining(TrainingParamsDTO trainingParams, PoleUser user)
       throws AccessDeniedException, TrainingException, ValidationException {
     roleFilter(user, trainingParams.getType());
-    // validationService.validateTrainingParams(trainingParams);
-    trainingDateValidatorHelper(trainingParams.getTrainingFrom(), trainingParams.getTrainingTo());
-    if (!validationService.trainingHallValidator(trainingParams.getHall())) throw new ValidationException("Hall is not acceptable!");
-    if (!validationService.trainingTypeValidator(trainingParams.getType())) throw new ValidationException("Type is not acceptable!");
-    if (trainingParams.getType().toUpperCase().equals(TrainingType.GROUP.toString())) {
-      if (!validationService.trainingLevelValidator(trainingParams.getLevel())) throw new ValidationException("Level is not acceptable!");
-    }
+    validationService.validateTrainingParams(trainingParams);
     Date trainingFrom = dateParser(trainingParams.getTrainingFrom());
     Date trainingTo = dateParser(trainingParams.getTrainingTo());
     if (trainingTimeCalculator(trainingFrom, trainingTo) < 60) throw new TrainingException("Training can not be shorter than 60 min");
@@ -87,11 +80,6 @@ public class TrainingServiceImpl implements TrainingService {
     return trainingRepo.findById(trainingId).orElseThrow(
         () -> new NoTrainingRepresentedException(
             "No training present with given id(" + trainingId + ") !"));
-  }
-
-  private void trainingDateValidatorHelper(String trainingFrom, String trainingTo) throws ValidationException {
-    validationService.trainingDateValidator(trainingFrom);
-    validationService.trainingDateValidator(trainingTo);
   }
 
   private Date dateParser(String dateToParse) throws TrainingException {

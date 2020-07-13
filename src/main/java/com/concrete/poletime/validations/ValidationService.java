@@ -1,6 +1,7 @@
 package com.concrete.poletime.validations;
 
 import com.concrete.poletime.dto.SetUserParamsDTO;
+import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.seasonticket.SeasonTicket;
 
@@ -21,4 +22,5 @@ public interface ValidationService {
     void currentSigUpTimeIsNotAbove(Long trainingFrom, Long signUpAttempt) throws ValidationException;
     SeasonTicket userHasValidSeasonTicket(Set<SeasonTicket> tickets, Date trainingFrom) throws ValidationException;
     void isTrainingLimitExceeded(int limit, int participants) throws ValidationException;
+    void validateTrainingParams(TrainingParamsDTO trainingParams) throws ValidationException;
 }
