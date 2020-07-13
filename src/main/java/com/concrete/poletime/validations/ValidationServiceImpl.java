@@ -1,18 +1,15 @@
 package com.concrete.poletime.validations;
 
 import com.concrete.poletime.dto.SetUserParamsDTO;
+import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.seasonticket.SeasonTicket;
-import com.concrete.poletime.training.Training;
 import com.concrete.poletime.utils.TrainingHall;
 import com.concrete.poletime.utils.TrainingLevel;
 import com.concrete.poletime.utils.TrainingType;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
@@ -138,5 +135,20 @@ public class ValidationServiceImpl implements ValidationService {
     if (participants == limit) {
       throw new ValidationException("Cannot sign up to given training. Limit has already been reached.");
     }
+  }
+
+  @Override
+  public void validateTrainingParams(TrainingParamsDTO trainingParams) throws ValidationException {
+    if (!trainingHallValidator(trainingParams.getHall())) throw new ValidationException("Hall is not acceptable!");
+    if (!trainingTypeValidator(trainingParams.getType())) throw new ValidationException("Type is not acceptable!");
+    if (trainingParams.getType().toUpperCase().equals(TrainingType.GROUP.toString())) {
+      if (!trainingLevelValidator(trainingParams.getLevel())) throw new ValidationException("Level is not acceptable!");
+    }
+    trainingDateValidatorHelper(trainingParams.getTrainingFrom(), trainingParams.getTrainingTo());
+  }
+
+  private void trainingDateValidatorHelper(String trainingFrom, String trainingTo) throws ValidationException {
+    trainingDateValidator(trainingFrom);
+    trainingDateValidator(trainingTo);
   }
 }
