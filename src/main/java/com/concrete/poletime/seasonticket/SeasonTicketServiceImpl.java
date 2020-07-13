@@ -3,11 +3,13 @@ package com.concrete.poletime.seasonticket;
 import com.concrete.poletime.dto.PoleUserDTO;
 import com.concrete.poletime.dto.SeasonTicketDTO;
 import com.concrete.poletime.dto.SeasonTicketParamsDTO;
+import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.SeasonTicketException;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.user.PoleUser;
 import com.concrete.poletime.utils.Role;
+import com.concrete.poletime.utils.dateservice.DateService;
 import com.concrete.poletime.validations.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,37 +22,29 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
 
   private SeasonTicketRepository seasonTicketRepo;
   private ValidationService validationService;
+  private DateService dateService;
 
   @Autowired
-  public SeasonTicketServiceImpl(SeasonTicketRepository seasonTicketRepo, ValidationService validationService) {
+  public SeasonTicketServiceImpl(SeasonTicketRepository seasonTicketRepo, ValidationService validationService,
+                                 DateService dateService) {
     this.seasonTicketRepo = seasonTicketRepo;
     this.validationService = validationService;
+    this.dateService = dateService;
   }
 
   @Override
-  public PoleUserDTO createSeasonTicket(SeasonTicketParamsDTO seasonTicketParams, Long sellerId, PoleUser poleUser) throws SeasonTicketException, ValidationException {
+  public PoleUserDTO createSeasonTicket(SeasonTicketParamsDTO seasonTicketParams, Long sellerId, PoleUser poleUser)
+      throws SeasonTicketException, ValidationException, DateConversionException {
     userFilter(poleUser);
     validationService.validityDateValidator(seasonTicketParams.getValidFrom());
     validationService.amountValidator(seasonTicketParams.getAmount());
-    LocalDate validFrom = dateParser(seasonTicketParams.getValidFrom());
-    if (!dateFilter(validFrom)) throw new SeasonTicketException("validFrom can not be smaller than today's date and has to be in 5 days from today!");
+    LocalDate validFrom = dateService.ticketDateParser(seasonTicketParams.getValidFrom());
+    validationService.ticketDateFilter(validFrom);
     LocalDate validTo = validToCalculator(validFrom, seasonTicketParams.getAmount());
-    if (!seasonTicketFilter(poleUser.getId(), validFrom)) throw new SeasonTicketException("User has a valid season ticket");
+    seasonTicketFilter(poleUser.getId(), validFrom);
     SeasonTicket seasonTicket = new SeasonTicket(validFrom, validTo, seasonTicketParams.getAmount(), sellerId, poleUser);
     seasonTicketRepo.save(seasonTicket);
     return new PoleUserDTO(poleUser);
-  }
-
-  private LocalDate dateParser(String date) throws SeasonTicketException {
-    try {
-      return LocalDate.parse(date);
-    } catch (Exception e) {
-      throw new SeasonTicketException(e.getMessage());
-    }
-  }
-
-  private boolean dateFilter(LocalDate date) {
-    return LocalDate.now().isEqual(date) || date.isBefore(LocalDate.now().plusDays(5));
   }
 
   private void userFilter(PoleUser poleUser) throws SeasonTicketException {
@@ -59,9 +53,11 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
     }
   }
 
-  private boolean seasonTicketFilter(Long userId, LocalDate validFrom) {
+  private void seasonTicketFilter(Long userId, LocalDate validFrom) throws SeasonTicketException {
     Optional<SeasonTicket> lastSeasonTicket = seasonTicketRepo.findLastSeasonTicket(userId);
-    return (!lastSeasonTicket.isPresent() || lastSeasonTicket.get().getValidTo().isBefore(validFrom));
+    if (lastSeasonTicket.isEmpty() || lastSeasonTicket.get().getValidTo().isBefore(validFrom)) {
+     throw new SeasonTicketException("User already has a valid season ticket");
+    }
   }
 
   private LocalDate validToCalculator(LocalDate validFrom, int amount) {
@@ -69,14 +65,16 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
   }
 
   @Override
-  public SeasonTicketDTO updateSeasonTicket(Long seasonTicketId, SeasonTicketParamsDTO seasonTicketParams) throws SeasonTicketException, ValidationException, RecordNotFoundException {
+  public SeasonTicketDTO updateSeasonTicket(Long seasonTicketId, SeasonTicketParamsDTO seasonTicketParams)
+      throws SeasonTicketException, ValidationException, RecordNotFoundException, DateConversionException {
     SeasonTicket seasonTicket = loadSeasonTicketById(seasonTicketId);
     LocalDate validFrom = seasonTicket.getValidFrom();
     if (seasonTicketParams.getValidFrom() != null) {
       validationService.validityDateValidator(seasonTicketParams.getValidFrom());
-      validFrom = dateParser(seasonTicketParams.getValidFrom());
-      if (!updateDateFilter(validFrom)) throw new SeasonTicketException("Valid from not in range. -5 and +5 day is allowed from today");
-      if (seasonTicketRepo.findValidSeasonTicket(seasonTicket.getPoleUser().getId(), seasonTicketId, validFrom).isPresent()) throw new SeasonTicketException("User has a valid season ticket");
+      validFrom = dateService.ticketDateParser(seasonTicketParams.getValidFrom());
+      updateDateFilter(validFrom);
+      if (seasonTicketRepo.findValidSeasonTicket(seasonTicket.getPoleUser().getId(), seasonTicketId, validFrom).isPresent())
+        throw new SeasonTicketException("User has a valid season ticket");
       seasonTicket.setValidFrom(validFrom);
     }
     if (seasonTicketParams.getAmount() != 0) {
@@ -89,8 +87,10 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
     return new SeasonTicketDTO(seasonTicket);
   }
 
-  private boolean updateDateFilter(LocalDate date) {
-    return date.isAfter(LocalDate.now().minusDays(6)) && date.isBefore(LocalDate.now().plusDays(6));
+  private void updateDateFilter(LocalDate date) throws SeasonTicketException {
+    if (!(date.isAfter(LocalDate.now().minusDays(6)) && date.isBefore(LocalDate.now().plusDays(6)))) {
+      throw new SeasonTicketException("Valid from not in range. -5 and +5 day is allowed from today");
+    }
   }
 
   @Override

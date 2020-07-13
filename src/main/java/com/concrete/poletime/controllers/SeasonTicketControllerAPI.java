@@ -2,6 +2,7 @@ package com.concrete.poletime.controllers;
 
 import com.concrete.poletime.authentication.AuthenticationService;
 import com.concrete.poletime.dto.SeasonTicketParamsDTO;
+import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.SeasonTicketException;
 import com.concrete.poletime.exceptions.ValidationException;
@@ -40,7 +41,7 @@ public class SeasonTicketControllerAPI {
       Long sellerId = authService.getUserIdFromToken(request);
       PoleUser poleUser = poleUserService.loadUserByEmail(seasonTicketParams.getEmail());
       return ResponseEntity.ok().body(seasonTicketService.createSeasonTicket(seasonTicketParams, sellerId, poleUser));
-    } catch (RecordNotFoundException| ValidationException| SeasonTicketException exc) {
+    } catch (RecordNotFoundException | ValidationException | SeasonTicketException | DateConversionException exc) {
       throw new ResponseStatusException(
         (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
         exc.getMessage(),
@@ -54,7 +55,7 @@ public class SeasonTicketControllerAPI {
   public ResponseEntity updateSeasonTicket(@RequestParam("seasonTicketId")Long seasonTicketId, @RequestBody SeasonTicketParamsDTO seasonTicketParams) {
     try {
       return ResponseEntity.ok().body(seasonTicketService.updateSeasonTicket(seasonTicketId, seasonTicketParams));
-    } catch (SeasonTicketException|ValidationException|RecordNotFoundException exc) {
+    } catch (SeasonTicketException | ValidationException | RecordNotFoundException | DateConversionException exc) {
       throw new ResponseStatusException(
         (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
         exc.getMessage(),

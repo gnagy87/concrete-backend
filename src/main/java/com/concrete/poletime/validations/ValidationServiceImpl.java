@@ -2,21 +2,30 @@ package com.concrete.poletime.validations;
 
 import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.dto.TrainingParamsDTO;
+import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.seasonticket.SeasonTicket;
 import com.concrete.poletime.utils.TrainingHall;
 import com.concrete.poletime.utils.TrainingLevel;
 import com.concrete.poletime.utils.TrainingType;
+import com.concrete.poletime.utils.dateservice.DateService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
+
+  private DateService dateService;
+
+  @Autowired
+  public ValidationServiceImpl(DateService dateService) {
+    this.dateService = dateService;
+  }
 
   @Override
   public void emailValidation(String email) throws ValidationException {
@@ -114,9 +123,8 @@ public class ValidationServiceImpl implements ValidationService {
 
   @Override
   public SeasonTicket userHasValidSeasonTicket(Set<SeasonTicket> tickets,
-                                          Date trainingFrom) throws ValidationException {
-    DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-    LocalDate trainingDate = LocalDate.parse(trainingFrom.toString(), format);
+                                          Date trainingFrom) throws ValidationException, DateConversionException {
+    LocalDate trainingDate = dateService.convertTrainingDateToLocalDate(trainingFrom);
     for (SeasonTicket ticket : tickets) {
       LocalDate validFrom = ticket.getValidFrom();
       LocalDate validTo = ticket.getValidTo();
@@ -145,6 +153,13 @@ public class ValidationServiceImpl implements ValidationService {
       if (!trainingLevelValidator(trainingParams.getLevel())) throw new ValidationException("Level is not acceptable!");
     }
     trainingDateValidatorHelper(trainingParams.getTrainingFrom(), trainingParams.getTrainingTo());
+  }
+
+  @Override
+  public void ticketDateFilter(LocalDate date) throws ValidationException {
+    if (!(LocalDate.now().isEqual(date) || date.isBefore(LocalDate.now().plusDays(5)))) {
+      throw new ValidationException("validFrom can not be smaller than today's date and has to be in 5 days from today!");
+    }
   }
 
   private void trainingDateValidatorHelper(String trainingFrom, String trainingTo) throws ValidationException {
