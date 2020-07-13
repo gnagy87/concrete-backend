@@ -25,6 +25,8 @@ public class SeasonTicket {
     private LocalDate validTo;
     @Column(nullable = false)
     private int amount;
+    @Column(nullable = false)
+    private int used;
     @Column(nullable = false, name = "seller_id")
     private Long sellerId;
     @Column(name = "created_at", updatable = false)
@@ -38,6 +40,7 @@ public class SeasonTicket {
         this.validFrom = validFrom;
         this.validTo = validTo;
         this.amount = amount;
+        this.used = 0;
         this.sellerId = sellerId;
         this.poleUser = poleUser;
     }

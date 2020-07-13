@@ -21,45 +21,45 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/seasonTicket")
 public class SeasonTicketControllerAPI {
 
-    private SeasonTicketService seasonTicketService;
-    private PoleUserService poleUserService;
-    private AuthenticationService authService;
+  private SeasonTicketService seasonTicketService;
+  private PoleUserService poleUserService;
+  private AuthenticationService authService;
 
 
-    @Autowired
-    public SeasonTicketControllerAPI(SeasonTicketService seasonTicketService, PoleUserService poleUserService, AuthenticationService authService) {
-        this.seasonTicketService = seasonTicketService;
-        this.poleUserService = poleUserService;
-        this.authService = authService;
+  @Autowired
+  public SeasonTicketControllerAPI(SeasonTicketService seasonTicketService, PoleUserService poleUserService, AuthenticationService authService) {
+    this.seasonTicketService = seasonTicketService;
+    this.poleUserService = poleUserService;
+    this.authService = authService;
+  }
+
+  @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
+  @PostMapping("/create")
+  public ResponseEntity setSeasonTicketToGuest(@RequestBody SeasonTicketParamsDTO seasonTicketParams, HttpServletRequest request) {
+    try {
+      Long sellerId = authService.getUserIdFromToken(request);
+      PoleUser poleUser = poleUserService.loadUserByEmail(seasonTicketParams.getEmail());
+      return ResponseEntity.ok().body(seasonTicketService.createSeasonTicket(seasonTicketParams, sellerId, poleUser));
+    } catch (RecordNotFoundException| ValidationException| SeasonTicketException exc) {
+      throw new ResponseStatusException(
+        (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
+        exc.getMessage(),
+        exc
+      );
     }
+  }
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
-    @PostMapping("/create")
-    public ResponseEntity setSeasonTicketToGuest(@RequestBody SeasonTicketParamsDTO seasonTicketParams, HttpServletRequest request) {
-        try {
-            Long sellerId = authService.getUserIdFromToken(request);
-            PoleUser poleUser = poleUserService.loadUserByEmail(seasonTicketParams.getEmail());
-            return ResponseEntity.ok().body(seasonTicketService.createSeasonTicket(seasonTicketParams, sellerId, poleUser));
-        } catch (RecordNotFoundException| ValidationException| SeasonTicketException exc) {
-            throw new ResponseStatusException(
-                    (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
-                    exc.getMessage(),
-                    exc
-            );
-        }
+  @PreAuthorize("hasAuthority('ADMIN')")
+  @PutMapping("/update")
+  public ResponseEntity updateSeasonTicket(@RequestParam("seasonTicketId")Long seasonTicketId, @RequestBody SeasonTicketParamsDTO seasonTicketParams) {
+    try {
+      return ResponseEntity.ok().body(seasonTicketService.updateSeasonTicket(seasonTicketId, seasonTicketParams));
+    } catch (SeasonTicketException|ValidationException|RecordNotFoundException exc) {
+      throw new ResponseStatusException(
+        (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
+        exc.getMessage(),
+        exc
+      );
     }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping("/update")
-    public ResponseEntity updateSeasonTicket(@RequestParam("seasonTicketId")Long seasonTicketId, @RequestBody SeasonTicketParamsDTO seasonTicketParams) {
-        try {
-            return ResponseEntity.ok().body(seasonTicketService.updateSeasonTicket(seasonTicketId, seasonTicketParams));
-        } catch (SeasonTicketException|ValidationException|RecordNotFoundException exc) {
-            throw new ResponseStatusException(
-                    (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
-                    exc.getMessage(),
-                    exc
-            );
-        }
-    }
+  }
 }

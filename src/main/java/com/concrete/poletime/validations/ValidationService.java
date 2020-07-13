@@ -2,6 +2,10 @@ package com.concrete.poletime.validations;
 
 import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.exceptions.ValidationException;
+import com.concrete.poletime.seasonticket.SeasonTicket;
+
+import java.util.Date;
+import java.util.Set;
 
 public interface ValidationService {
     void emailValidation(String email) throws ValidationException;
@@ -14,4 +18,7 @@ public interface ValidationService {
     boolean trainingHallValidator(String hall);
     boolean trainingTypeValidator(String type);
     boolean trainingLevelValidator(String level);
+    void currentSigUpTimeIsNotAbove(Long trainingFrom, Long signUpAttempt) throws ValidationException;
+    SeasonTicket userHasValidSeasonTicket(Set<SeasonTicket> tickets, Date trainingFrom) throws ValidationException;
+    void isTrainingLimitExceeded(int limit, int participants) throws ValidationException;
 }
