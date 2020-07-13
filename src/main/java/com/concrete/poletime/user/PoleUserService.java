@@ -9,6 +9,7 @@ import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.RegistrationException;
 import com.concrete.poletime.exceptions.ValidationException;
 
+import javax.persistence.PersistenceException;
 import javax.security.auth.login.LoginException;
 import java.util.List;
 
@@ -21,4 +22,5 @@ public interface PoleUserService {
     List getUsersWithValidSeasonTicket();
     PoleUserDTO updateRecords(PoleUser user, SetUserParamsDTO userParams) throws ValidationException;
     String confirmUser(ConfirmationToken confirmationToken) throws RecordNotFoundException, ConfirmationException;
+    PoleUser saveUser(PoleUser user) throws PersistenceException;
 }

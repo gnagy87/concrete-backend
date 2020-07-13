@@ -20,29 +20,44 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/api/training")
 public class TrainingControllerAPI {
-    private TrainingService trainingService;
-    private AuthenticationService authService;
+  private TrainingService trainingService;
+  private AuthenticationService authService;
 
-    @Autowired
-    public TrainingControllerAPI(TrainingService trainingService, AuthenticationService authService) {
-        this.trainingService = trainingService;
-        this.authService = authService;
-    }
+  @Autowired
+  public TrainingControllerAPI(TrainingService trainingService, AuthenticationService authService) {
+    this.trainingService = trainingService;
+    this.authService = authService;
+  }
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
-    @PostMapping("/create")
-    public ResponseEntity setTraining(@RequestBody TrainingParamsDTO trainingParams, HttpServletRequest request) {
-        try {
-            PoleUser user = authService.currentUser(request);
-            return ResponseEntity.ok().body(trainingService.createTraining(trainingParams, user));
-        } catch (AccessDeniedException exc) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, exc.getMessage(), exc);
-        } catch (RecordNotFoundException|ValidationException| TrainingException exc) {
-            throw new ResponseStatusException(
-                    (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
-                    exc.getMessage(),
-                    exc
-            );
-        }
+  @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
+  @PostMapping("/create")
+  public ResponseEntity setTraining(@RequestBody TrainingParamsDTO trainingParams, HttpServletRequest request) {
+    try {
+      PoleUser user = authService.currentUser(request);
+      return ResponseEntity.ok().body(trainingService.createTraining(trainingParams, user));
+    } catch (AccessDeniedException exc) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, exc.getMessage(), exc);
+    } catch (RecordNotFoundException|ValidationException| TrainingException exc) {
+      throw new ResponseStatusException(
+          (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
+          exc.getMessage(),
+          exc
+      );
     }
+  }
+
+  @PostMapping("/signup")
+  public ResponseEntity signUpToTraining(@RequestParam("trainingId") Long trainingId,
+                                         HttpServletRequest request) {
+    try {
+      PoleUser user = authService.currentUser(request);
+      return ResponseEntity.status(200).body(trainingService.signUpForTraining(trainingId, user));
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          e.getMessage(),
+          e
+      );
+    }
+  }
 }

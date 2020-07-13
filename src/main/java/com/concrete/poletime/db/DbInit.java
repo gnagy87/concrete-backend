@@ -52,6 +52,7 @@ public class DbInit implements CommandLineRunner {
             guest.setEnabled(true);
             SeasonTicket seasonTicket = new SeasonTicket();
             seasonTicket.setAmount(20);
+            seasonTicket.setUsed(0);
             seasonTicket.setSellerId(admin.getId());
             seasonTicket.setValidFrom(LocalDate.now());
             seasonTicket.setValidTo(seasonTicket.getValidFrom().plusDays(30));

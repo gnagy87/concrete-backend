@@ -1,9 +1,9 @@
 package com.concrete.poletime.utils;
 
 public enum TrainingType {
-    GROUP,
+    GROUP, // GUEST user csak erre
     PRIVATE,
     PRACTICE_TRAINER,
     PRACTICE_GUEST,
-    PARTY
+    PARTY // // GUEST user csak erre
 }

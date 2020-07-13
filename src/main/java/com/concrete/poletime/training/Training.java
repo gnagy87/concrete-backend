@@ -31,6 +31,8 @@ public class Training {
     private TrainingHall hall;
     @Column(name = "person_limit")
     private int personLimit;
+    @Column(name = "participants")
+    private int participants;
     @Enumerated(EnumType.STRING)
     private TrainingType type;
     @Enumerated(EnumType.STRING)
@@ -50,6 +52,7 @@ public class Training {
         this.trainingTo = trainingTo;
         this.hall = hall;
         this.personLimit = personLimit;
+        this.participants = 0;
         this.type = type;
         this.level = level;
         this.organizerId = organizerId;
