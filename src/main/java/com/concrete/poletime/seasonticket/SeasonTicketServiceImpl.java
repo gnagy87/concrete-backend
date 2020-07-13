@@ -55,7 +55,7 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
 
   private void seasonTicketFilter(Long userId, LocalDate validFrom) throws SeasonTicketException {
     Optional<SeasonTicket> lastSeasonTicket = seasonTicketRepo.findLastSeasonTicket(userId);
-    if (lastSeasonTicket.isEmpty() || lastSeasonTicket.get().getValidTo().isBefore(validFrom)) {
+    if (!(lastSeasonTicket.isEmpty() || lastSeasonTicket.get().getValidTo().isBefore(validFrom))) {
      throw new SeasonTicketException("User already has a valid season ticket");
     }
   }
