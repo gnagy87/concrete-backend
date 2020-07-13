@@ -2,6 +2,7 @@ package com.concrete.poletime.training;
 
 import com.concrete.poletime.dto.TrainingDTO;
 import com.concrete.poletime.dto.TrainingParamsDTO;
+import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.NoTrainingRepresentedException;
 import com.concrete.poletime.exceptions.TrainingException;
 import com.concrete.poletime.exceptions.ValidationException;
@@ -11,6 +12,8 @@ import com.concrete.poletime.utils.Role;
 import com.concrete.poletime.utils.TrainingHall;
 import com.concrete.poletime.utils.TrainingLevel;
 import com.concrete.poletime.utils.TrainingType;
+import com.concrete.poletime.utils.dateservice.DateService;
+import com.concrete.poletime.utils.timeservice.TimeService;
 import com.concrete.poletime.validations.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,23 +31,27 @@ public class TrainingServiceImpl implements TrainingService {
   private TrainingRepository trainingRepo;
   private ValidationService validationService;
   private PoleUserService userService;
+  private TimeService timeService;
+  private DateService dateService;
 
   @Autowired
   public TrainingServiceImpl(TrainingRepository trainingRepo, ValidationService validationService,
-                             PoleUserService userService) {
+                             PoleUserService userService, TimeService timeService, DateService dateService) {
     this.trainingRepo = trainingRepo;
     this.validationService = validationService;
     this.userService = userService;
+    this.timeService = timeService;
+    this.dateService = dateService;
   }
 
   @Override
   public TrainingDTO createTraining(TrainingParamsDTO trainingParams, PoleUser user)
-      throws AccessDeniedException, TrainingException, ValidationException {
+      throws AccessDeniedException, TrainingException, ValidationException, DateConversionException {
     roleFilter(user, trainingParams.getType());
     validationService.validateTrainingParams(trainingParams);
-    Date trainingFrom = dateParser(trainingParams.getTrainingFrom());
-    Date trainingTo = dateParser(trainingParams.getTrainingTo());
-    if (trainingTimeCalculator(trainingFrom, trainingTo) < 60) throw new TrainingException("Training can not be shorter than 60 min");
+    Date trainingFrom = dateService.trainingDateParser(trainingParams.getTrainingFrom());
+    Date trainingTo = dateService.trainingDateParser(trainingParams.getTrainingTo());
+    if (timeService.trainingTimeCalculator(trainingFrom, trainingTo) < 60) throw new TrainingException("Training can not be shorter than 60 min");
     if (isTrainingAccepted(trainingParams.getHall().toUpperCase(), trainingFrom, trainingTo)) throw new TrainingException("There is another training in the same time period");
     Training training = new Training(
       trainingFrom,
@@ -60,7 +67,7 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   public List<TrainingDTO> signUpForTraining(Long trainingId, PoleUser user) throws
-      ValidationException, NoTrainingRepresentedException, PersistenceException {
+      ValidationException, NoTrainingRepresentedException, PersistenceException, DateConversionException {
     Training training = loadTrainingById(trainingId);
     validationService.isTrainingLimitExceeded(training.getPersonLimit(), training.getParticipants());
     validationService.currentSigUpTimeIsNotAbove(training.getTrainingFrom().getTime(),
@@ -82,23 +89,10 @@ public class TrainingServiceImpl implements TrainingService {
             "No training present with given id(" + trainingId + ") !"));
   }
 
-  private Date dateParser(String dateToParse) throws TrainingException {
-    try {
-      return new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dateToParse);
-    } catch (Exception e) {
-      throw new TrainingException(e.getMessage());
-    }
-  }
-
   private void roleFilter(PoleUser user, String type) throws AccessDeniedException {
     if (type.toUpperCase().equals(TrainingType.GROUP.toString()) && !user.getRole().equals(Role.ADMIN)) {
       throw new AccessDeniedException("User is not able to create GROUP training!");
     }
-  }
-
-  private long trainingTimeCalculator(Date trainingFrom, Date trainingTo) throws TrainingException {
-    if (trainingTo.before(trainingFrom)) throw new TrainingException("trainingTo can not be smaller than trainingFrom");
-    return (trainingTo.getTime() - trainingFrom.getTime()) / (60 * 1000);
   }
 
   private boolean isTrainingAccepted(String hall, Date trainingFrom, Date trainingTo) {

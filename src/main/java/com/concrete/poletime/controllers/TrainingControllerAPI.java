@@ -2,6 +2,7 @@ package com.concrete.poletime.controllers;
 
 import com.concrete.poletime.authentication.AuthenticationService;
 import com.concrete.poletime.dto.TrainingParamsDTO;
+import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.TrainingException;
 import com.concrete.poletime.exceptions.ValidationException;
@@ -37,7 +38,7 @@ public class TrainingControllerAPI {
       return ResponseEntity.ok().body(trainingService.createTraining(trainingParams, user));
     } catch (AccessDeniedException exc) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, exc.getMessage(), exc);
-    } catch (RecordNotFoundException|ValidationException| TrainingException exc) {
+    } catch (RecordNotFoundException|ValidationException| TrainingException | DateConversionException exc) {
       throw new ResponseStatusException(
           (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
           exc.getMessage(),
