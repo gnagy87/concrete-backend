@@ -30,4 +30,12 @@ public interface TrainingRepository extends CrudRepository<Training, Long> {
         nativeQuery = true
     )
     Optional<List<Training>> loadGroupTrainings(Date fromDate, Date toDate);
+
+    @Query(
+        value = "SELECT * FROM trainings " +
+                "WHERE type != 'GROUP' " +
+                "ORDER BY training_from, training_to",
+        nativeQuery = true
+    )
+    Optional<List<Training>> loadNonGroupTrainings();
 }

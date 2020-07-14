@@ -121,4 +121,18 @@ public class TrainingControllerAPI {
       );
     }
   }
+
+  @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
+  @GetMapping("/nongrouptrainings")
+  public ResponseEntity getNonPublicTrainings() {
+    try {
+      return ResponseEntity.status(200).body(trainingService.getNonGroupTrainings());
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          e.getMessage(),
+          e
+      );
+    }
+  }
 }
