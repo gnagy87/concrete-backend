@@ -3,6 +3,7 @@ package com.concrete.poletime.exceptions.exception_handler;
 import com.concrete.poletime.error.StatusMessageDTO;
 import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.NoTrainingRepresentedException;
+import com.concrete.poletime.exceptions.TrainingIsHeldUnsettableException;
 import com.concrete.poletime.exceptions.ValidationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -103,6 +104,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
         new HttpHeaders(),
         HttpStatus.CONFLICT,
+        request
+    );
+  }
+
+  @ExceptionHandler({TrainingIsHeldUnsettableException.class})
+  public ResponseEntity<Object> handleTrainingIsHeldUnsettableException(TrainingIsHeldUnsettableException ex,
+                                                                        WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.PRECONDITION_FAILED,
         request
     );
   }

@@ -3,6 +3,7 @@ package com.concrete.poletime.validations;
 import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.DateConversionException;
+import com.concrete.poletime.exceptions.TrainingIsHeldUnsettableException;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.seasonticket.SeasonTicket;
 import com.concrete.poletime.training.Training;
@@ -148,7 +149,7 @@ public class ValidationServiceImpl implements ValidationService {
 
   @Override
   public void isTrainingLimitExceeded(int limit, int participants) throws ValidationException {
-    if (participants == limit) {
+    if (participants >= limit) {
       throw new ValidationException("Cannot sign up to given training. Limit has already been reached.");
     }
   }
@@ -207,5 +208,13 @@ public class ValidationServiceImpl implements ValidationService {
       throw new ValidationException("Invalid attempt! User is not participate on given training!");
     }
     validate24hours(training.getTrainingFrom().getTime(), new Date(System.currentTimeMillis()).getTime());
+  }
+
+  @Override
+  public void doesTrainingIsHeldSettable(Long trainingTo, Long now) throws TrainingIsHeldUnsettableException {
+    if ((now - trainingTo) < 0) {
+      throw new TrainingIsHeldUnsettableException(
+          "Cannot set training isHeld before training has been finished! :) Hogy gondolod? Nem is értem...");
+    }
   }
 }

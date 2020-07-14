@@ -2,10 +2,7 @@ package com.concrete.poletime.training;
 
 import com.concrete.poletime.dto.TrainingDTO;
 import com.concrete.poletime.dto.TrainingParamsDTO;
-import com.concrete.poletime.exceptions.DateConversionException;
-import com.concrete.poletime.exceptions.NoTrainingRepresentedException;
-import com.concrete.poletime.exceptions.TrainingException;
-import com.concrete.poletime.exceptions.ValidationException;
+import com.concrete.poletime.exceptions.*;
 import com.concrete.poletime.seasonticket.SeasonTicket;
 import com.concrete.poletime.user.PoleUser;
 import com.concrete.poletime.user.PoleUserService;
@@ -98,6 +95,17 @@ public class TrainingServiceImpl implements TrainingService {
     training.setParticipants(training.getParticipants() - 1);
     PoleUser signedDownUser = userService.saveUser(user);
     return convertToDTOList(signedDownUser.getTrainings());
+  }
+
+  @Override
+  public TrainingDTO setTrainingIsHeld(Long trainingId) throws NoTrainingRepresentedException,
+                                                               TrainingIsHeldUnsettableException {
+    Training training = loadTrainingById(trainingId);
+    validationService.doesTrainingIsHeldSettable(training.getTrainingTo().getTime(),
+        new Date(System.currentTimeMillis()).getTime());
+    training.setHeld(true);
+    trainingRepo.save(training);
+    return new TrainingDTO(training);
   }
 
   public List<TrainingDTO> convertToDTOList(Set<Training> trainings) {

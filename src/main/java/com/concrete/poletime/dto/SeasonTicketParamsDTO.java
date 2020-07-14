@@ -17,6 +17,6 @@ public class SeasonTicketParamsDTO {
     private String email;
     @NotNull @NotEmpty
     private String validFrom;
-    @NotNull @NotEmpty
+    @NotNull
     private int amount;
 }

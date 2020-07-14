@@ -3,6 +3,7 @@ package com.concrete.poletime.validations;
 import com.concrete.poletime.dto.SetUserParamsDTO;
 import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.DateConversionException;
+import com.concrete.poletime.exceptions.TrainingIsHeldUnsettableException;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.seasonticket.SeasonTicket;
 import com.concrete.poletime.training.Training;
@@ -34,4 +35,5 @@ public interface ValidationService {
     void userHasAmountToUse(SeasonTicket ticket) throws ValidationException;
     void validateSignUpAttempt(Training training, PoleUser user) throws ValidationException;
     void validateSignDownAttempt(Training training, PoleUser user) throws ValidationException;
+    void doesTrainingIsHeldSettable(Long trainingTo, Long now) throws TrainingIsHeldUnsettableException;
 }
