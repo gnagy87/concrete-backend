@@ -217,4 +217,10 @@ public class ValidationServiceImpl implements ValidationService {
           "Cannot set training isHeld before training has been finished! :) Hogy gondolod? Nem is értem...");
     }
   }
+
+  @Override
+  public void validateFromDateIsNotAfter(Date fromDate, Date toDate) throws ValidationException {
+    if(toDate.before(fromDate)) {throw new ValidationException(
+        "Invalid interval of dates: toDate is earlier than fromDate!");}
+  }
 }

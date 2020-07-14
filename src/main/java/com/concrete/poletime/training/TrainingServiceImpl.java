@@ -21,7 +21,6 @@ import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,7 +74,7 @@ public class TrainingServiceImpl implements TrainingService {
     training.setParticipants(training.getParticipants() + 1);
     user.addTraining(training);
     PoleUser signedUpUser = userService.saveUser(user);
-    return convertToDTOList(signedUpUser.getTrainings());
+    return convertToDTOList(new ArrayList<>(signedUpUser.getTrainings()));
   }
 
   @Override
@@ -95,7 +94,7 @@ public class TrainingServiceImpl implements TrainingService {
     ticket.setUsed(ticket.getUsed() - 1);
     training.setParticipants(training.getParticipants() - 1);
     PoleUser signedDownUser = userService.saveUser(user);
-    return convertToDTOList(signedDownUser.getTrainings());
+    return convertToDTOList(new ArrayList<>(signedDownUser.getTrainings()));
   }
 
   @Override
@@ -115,7 +114,21 @@ public class TrainingServiceImpl implements TrainingService {
     return new ArrayList<>(trainig.getPoleUsers());
   }
 
-  public List<TrainingDTO> convertToDTOList(Set<Training> trainings) {
+  @Override
+  public List<TrainingDTO> getGroupTrainings(String fromDate, String toDate) throws ValidationException,
+      DateConversionException, CannotLoadDataFromDbException {
+    validationService.trainingDateValidator(fromDate);
+    validationService.trainingDateValidator(toDate);
+    Date parsedFromDate = dateService.trainingDateParser(fromDate);
+    Date parsedToDate = dateService.trainingDateParser(toDate);
+    validationService.validateFromDateIsNotAfter(parsedFromDate, parsedToDate);
+    List<Training> groupTrainings = trainingRepo.loadGroupTrainings(parsedFromDate,parsedToDate)
+        .orElseThrow(() -> new CannotLoadDataFromDbException(
+            "Error occurred during retrieval of DB elements! No any DB elements found by given date interval."));
+    return convertToDTOList(groupTrainings);
+  }
+
+  public List<TrainingDTO> convertToDTOList(List<Training> trainings) {
     return trainings.stream()
         .map(TrainingDTO::new)
         .filter(t -> !t.isHeld())

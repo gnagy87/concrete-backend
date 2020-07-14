@@ -1,10 +1,7 @@
 package com.concrete.poletime.exceptions.exception_handler;
 
 import com.concrete.poletime.error.StatusMessageDTO;
-import com.concrete.poletime.exceptions.DateConversionException;
-import com.concrete.poletime.exceptions.NoTrainingRepresentedException;
-import com.concrete.poletime.exceptions.TrainingIsHeldUnsettableException;
-import com.concrete.poletime.exceptions.ValidationException;
+import com.concrete.poletime.exceptions.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -116,6 +113,18 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
         new HttpHeaders(),
         HttpStatus.PRECONDITION_FAILED,
+        request
+    );
+  }
+
+  @ExceptionHandler({CannotLoadDataFromDbException.class})
+  public ResponseEntity<Object> handleCannotLoadDataFromDbException(CannotLoadDataFromDbException ex,
+                                                                    WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.CONFLICT,
         request
     );
   }

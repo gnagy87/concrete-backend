@@ -23,4 +23,5 @@ public interface TrainingService {
 
     TrainingDTO setTrainingIsHeld(Long trainingId) throws NoTrainingRepresentedException, TrainingIsHeldUnsettableException;
     List<PoleUser> loadUsersByTraining(Long trainingId) throws NoTrainingRepresentedException;
+    List<TrainingDTO> getGroupTrainings(String fromDate, String toDate) throws ValidationException, DateConversionException, CannotLoadDataFromDbException;
 }

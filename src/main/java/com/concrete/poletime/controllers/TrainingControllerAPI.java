@@ -81,7 +81,7 @@ public class TrainingControllerAPI {
   }
 
   @PreAuthorize("hasAuthority('ADMIN')")
-  @PutMapping("isheld")
+  @PutMapping("/isheld")
   public ResponseEntity setTrainingIdIsHeld(@RequestParam("trainingId") Long trainingId) {
     try {
       return ResponseEntity.status(200).body(trainingService.setTrainingIsHeld(trainingId));
@@ -95,10 +95,24 @@ public class TrainingControllerAPI {
   }
 
   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
-  @PostMapping("ontraining")
+  @PostMapping("/ontraining")
   public ResponseEntity trainingWithUsers(@RequestParam("trainingId") Long trainingId) {
     try {
       return ResponseEntity.status(200).body(trainingService.loadUsersByTraining(trainingId));
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          e.getMessage(),
+          e
+      );
+    }
+  }
+
+  @PostMapping("/grouptrainings")
+  public ResponseEntity getGroupTrainings(@RequestParam("fromDate") String fromDate,
+                                          @RequestParam("toDate") String toDate) {
+    try {
+      return ResponseEntity.status(200).body(trainingService.getGroupTrainings(fromDate, toDate));
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
