@@ -34,7 +34,7 @@ public interface ValidationService {
     void validate24hours(Long trainingFrom, Long now) throws ValidationException;
     void userHasAmountToUse(SeasonTicket ticket) throws ValidationException;
     void validateSignUpAttempt(Training training, PoleUser user, int withTimeLimit) throws ValidationException;
-    void validateSignDownAttempt(Training training, PoleUser user) throws ValidationException;
+    void validateSignDownAttempt(Training training, PoleUser user, int withTimeLimit) throws ValidationException;
     void doesTrainingIsHeldSettable(Long trainingTo, Long now) throws TrainingIsHeldUnsettableException;
     void validateFromDateIsNotAfter(Date fromDate, Date toDate) throws ValidationException;
 }
