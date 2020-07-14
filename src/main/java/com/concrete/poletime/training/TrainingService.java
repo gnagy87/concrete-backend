@@ -14,14 +14,13 @@ import java.util.List;
 
 public interface TrainingService {
     TrainingDTO createTraining(TrainingParamsDTO trainingParams, PoleUser user) throws
-        AccessDeniedException,
-        TrainingException,
-        ValidationException, DateConversionException;
+        AccessDeniedException, TrainingException, ValidationException, DateConversionException;
 
     List<TrainingDTO> signUpForTraining(Long trainingId, PoleUser user) throws
-        ValidationException,
-        NoTrainingRepresentedException,
-        PersistenceException, DateConversionException;
+        ValidationException, NoTrainingRepresentedException, PersistenceException, DateConversionException;
 
     Training loadTrainingById(Long trainingId) throws NoTrainingRepresentedException;
+
+    List<TrainingDTO> signDownFromTraining(Long trainingId, PoleUser user) throws
+        NoTrainingRepresentedException, ValidationException, DateConversionException;
 }

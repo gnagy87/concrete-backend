@@ -35,7 +35,7 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
   @Override
   public PoleUserDTO createSeasonTicket(SeasonTicketParamsDTO seasonTicketParams, Long sellerId, PoleUser poleUser)
       throws SeasonTicketException, ValidationException, DateConversionException {
-    userFilter(poleUser);
+    validationService.userFilter(poleUser);
     validationService.validityDateValidator(seasonTicketParams.getValidFrom());
     validationService.amountValidator(seasonTicketParams.getAmount());
     LocalDate validFrom = dateService.ticketDateParser(seasonTicketParams.getValidFrom());
@@ -45,12 +45,6 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
     SeasonTicket seasonTicket = new SeasonTicket(validFrom, validTo, seasonTicketParams.getAmount(), sellerId, poleUser);
     seasonTicketRepo.save(seasonTicket);
     return new PoleUserDTO(poleUser);
-  }
-
-  private void userFilter(PoleUser poleUser) throws SeasonTicketException {
-    if (!poleUser.isEnabled() || poleUser.getRole().equals(Role.ADMIN) || poleUser.getRole().equals(Role.TRAINER)) {
-      throw new SeasonTicketException("User is not acceptable to set Season Ticket! User is not enabled/ADMIN/TRAINER");
-    }
   }
 
   private void seasonTicketFilter(Long userId, LocalDate validFrom) throws SeasonTicketException {

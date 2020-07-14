@@ -5,6 +5,8 @@ import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.seasonticket.SeasonTicket;
+import com.concrete.poletime.training.Training;
+import com.concrete.poletime.user.PoleUser;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -27,4 +29,9 @@ public interface ValidationService {
     void isTrainingLimitExceeded(int limit, int participants) throws ValidationException;
     void validateTrainingParams(TrainingParamsDTO trainingParams) throws ValidationException;
     void ticketDateFilter(LocalDate date) throws ValidationException;
+    void userFilter(PoleUser poleUser) throws ValidationException;
+    void validate24hours(Long trainingFrom, Long now) throws ValidationException;
+    void userHasAmountToUse(SeasonTicket ticket) throws ValidationException;
+    void validateSignUpAttempt(Training training, PoleUser user) throws ValidationException;
+    void validateSignDownAttempt(Training training, PoleUser user) throws ValidationException;
 }

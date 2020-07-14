@@ -61,4 +61,19 @@ public class TrainingControllerAPI {
       );
     }
   }
+
+  @PostMapping("/signdown")
+  public ResponseEntity signDownFromTraining(@RequestParam("trainingId") Long trainingId,
+                                             HttpServletRequest request) {
+    try {
+      PoleUser user = authService.currentUser(request);
+      return ResponseEntity.status(200).body(trainingService.signDownFromTraining(trainingId, user));
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          e.getMessage(),
+          e
+      );
+    }
+  }
 }

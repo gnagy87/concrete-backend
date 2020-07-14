@@ -65,4 +65,9 @@ public class PoleUser {
     this.getTrainings().add(training);
     training.getPoleUsers().add(this);
   }
+
+  public void removeTraining(Training training) {
+    this.getTrainings().remove(training);
+    training.getPoleUsers().remove(this);
+  }
 }
