@@ -18,6 +18,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.PersistenceException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -106,6 +107,12 @@ public class TrainingServiceImpl implements TrainingService {
     training.setHeld(true);
     trainingRepo.save(training);
     return new TrainingDTO(training);
+  }
+
+  @Override
+  public List<PoleUser> loadUsersByTraining(Long trainingId) throws NoTrainingRepresentedException {
+    Training trainig = loadTrainingById(trainingId);
+    return new ArrayList<>(trainig.getPoleUsers());
   }
 
   public List<TrainingDTO> convertToDTOList(Set<Training> trainings) {

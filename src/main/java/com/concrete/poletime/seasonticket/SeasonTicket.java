@@ -1,6 +1,7 @@
 package com.concrete.poletime.seasonticket;
 
 import com.concrete.poletime.user.PoleUser;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +33,8 @@ public class SeasonTicket {
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private Date createdAt;
+
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private PoleUser poleUser;
