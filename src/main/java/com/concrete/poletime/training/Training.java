@@ -4,6 +4,7 @@ import com.concrete.poletime.user.PoleUser;
 import com.concrete.poletime.utils.TrainingHall;
 import com.concrete.poletime.utils.TrainingLevel;
 import com.concrete.poletime.utils.TrainingType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,6 +45,7 @@ public class Training {
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private Date createdAt;
+    @JsonBackReference
     @ManyToMany(mappedBy = "trainings")
     private Set<PoleUser> poleUsers;
 

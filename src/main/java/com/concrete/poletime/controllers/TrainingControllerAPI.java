@@ -93,4 +93,18 @@ public class TrainingControllerAPI {
       );
     }
   }
+
+  @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
+  @PostMapping("ontraining")
+  public ResponseEntity trainingWithUsers(@RequestParam("trainingId") Long trainingId) {
+    try {
+      return ResponseEntity.status(200).body(trainingService.loadUsersByTraining(trainingId));
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          e.getMessage(),
+          e
+      );
+    }
+  }
 }

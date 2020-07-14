@@ -3,6 +3,7 @@ package com.concrete.poletime.user;
 import com.concrete.poletime.seasonticket.SeasonTicket;
 import com.concrete.poletime.training.Training;
 import com.concrete.poletime.utils.Role;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,8 +40,10 @@ public class PoleUser {
   @Column(name = "created_at", updatable = false)
   @CreationTimestamp
   private Date createdAt;
+  @JsonManagedReference
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "poleUser", fetch = FetchType.LAZY)
   private Set<SeasonTicket> seasonTickets;
+  @JsonManagedReference
   @ManyToMany
   @JoinTable(
       name = "users_trainings",
