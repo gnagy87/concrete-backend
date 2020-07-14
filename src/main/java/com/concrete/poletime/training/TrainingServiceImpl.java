@@ -67,7 +67,7 @@ public class TrainingServiceImpl implements TrainingService {
   public List<TrainingDTO> signUpForTraining(Long trainingId, PoleUser user) throws
       ValidationException, NoTrainingRepresentedException, PersistenceException, DateConversionException {
     Training training = loadTrainingById(trainingId);
-    validationService.validateSignUpAttempt(training, user);
+    validationService.validateSignUpAttempt(training, user, 1);
     SeasonTicket ticket = validationService.userHasValidSeasonTicket(user.getSeasonTickets(), training.getTrainingFrom());
     validationService.userHasAmountToUse(ticket);
     ticket.setUsed(ticket.getUsed() + 1);
@@ -110,8 +110,8 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   public List<PoleUser> loadUsersByTraining(Long trainingId) throws NoTrainingRepresentedException {
-    Training trainig = loadTrainingById(trainingId);
-    return new ArrayList<>(trainig.getPoleUsers());
+    Training training = loadTrainingById(trainingId);
+    return new ArrayList<>(training.getPoleUsers());
   }
 
   @Override
@@ -134,6 +134,18 @@ public class TrainingServiceImpl implements TrainingService {
         .orElseThrow(() -> new CannotLoadDataFromDbException(
             "Error occurred during retrieval of DB elements! No any DB elements found by given date interval."));
     return convertToDTOList(nonGroupTrainings);
+  }
+
+  @Override
+  public List<TrainingDTO> setUserToTraining(Long trainingId, Long guestUserId) throws
+      NoTrainingRepresentedException, RecordNotFoundException, ValidationException {
+    Training training = loadTrainingById(trainingId);
+    PoleUser guestUser = userService.loadUserById(guestUserId);
+    validationService.validateSignUpAttempt(training, guestUser, 0);
+    training.setParticipants(training.getParticipants() + 1);
+    guestUser.addTraining(training);
+    PoleUser signedUpUser = userService.saveUser(guestUser);
+    return convertToDTOList(new ArrayList<>(signedUpUser.getTrainings()));
   }
 
   public List<TrainingDTO> convertToDTOList(List<Training> trainings) {
