@@ -79,4 +79,18 @@ public class TrainingControllerAPI {
       );
     }
   }
+
+  @PreAuthorize("hasAuthority('ADMIN')")
+  @PutMapping("isheld")
+  public ResponseEntity setTrainingIdIsHeld(@RequestParam("trainingId") Long trainingId) {
+    try {
+      return ResponseEntity.status(200).body(trainingService.setTrainingIsHeld(trainingId));
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          e.getMessage(),
+          e
+      );
+    }
+  }
 }

@@ -19,7 +19,7 @@ public class TrainingParamsDTO {
     private String trainingTo;
     @NotNull @NotEmpty
     private String hall;
-    @NotNull @NotEmpty
+    @NotNull
     private int personLimit;
     @NotNull @NotEmpty
     private String type;
