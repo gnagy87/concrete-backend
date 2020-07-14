@@ -13,13 +13,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/training")
+@Validated
 public class TrainingControllerAPI {
   private TrainingService trainingService;
   private AuthenticationService authService;
@@ -32,7 +35,7 @@ public class TrainingControllerAPI {
 
   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
   @PostMapping("/create")
-  public ResponseEntity setTraining(@RequestBody TrainingParamsDTO trainingParams, HttpServletRequest request) {
+  public ResponseEntity setTraining(@Valid @RequestBody TrainingParamsDTO trainingParams, HttpServletRequest request) {
     try {
       PoleUser user = authService.currentUser(request);
       return ResponseEntity.ok().body(trainingService.createTraining(trainingParams, user));

@@ -15,14 +15,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/user")
+@Validated
 public class UserControllerAPI {
 
     private PoleUserService poleUserService;
@@ -42,7 +45,7 @@ public class UserControllerAPI {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity doRegistration(@RequestBody SetUserParamsDTO userParams) {
+    public ResponseEntity doRegistration(@Valid @RequestBody SetUserParamsDTO userParams) {
         try {
             PoleUser newUser = poleUserService.registration(userParams);
             ConfirmationToken confirmationToken = confirmationTokenService.setConfirmationTokenToUser(newUser);
@@ -69,7 +72,7 @@ public class UserControllerAPI {
     }
 
     @PostMapping("/login")
-    public ResponseEntity doLogin(@RequestBody LoginRequestDTO logRequest) {
+    public ResponseEntity doLogin(@Valid @RequestBody LoginRequestDTO logRequest) {
         try {
             Long userId = poleUserService.login(logRequest);
             AuthenticationResponseDTO auth = authService.authentication(userId);
@@ -102,7 +105,8 @@ public class UserControllerAPI {
     }
 
     @PutMapping("/update")
-    public ResponseEntity updateUser(@RequestBody SetUserParamsDTO userParams, HttpServletRequest request) {
+    public ResponseEntity updateUser(@Valid @RequestBody SetUserParamsDTO userParams,
+                                     HttpServletRequest request) {
         try {
             PoleUser currentUser = authService.currentUser(request);
             return ResponseEntity.ok().body(poleUserService.updateRecords(currentUser, userParams));

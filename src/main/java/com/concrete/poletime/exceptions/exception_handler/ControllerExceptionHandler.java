@@ -1,6 +1,9 @@
 package com.concrete.poletime.exceptions.exception_handler;
 
 import com.concrete.poletime.error.StatusMessageDTO;
+import com.concrete.poletime.exceptions.DateConversionException;
+import com.concrete.poletime.exceptions.NoTrainingRepresentedException;
+import com.concrete.poletime.exceptions.ValidationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,7 +32,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     String message = "Missing parameter(s): " + ex.getBindingResult().getAllErrors().stream()
         .map((error) -> ((FieldError) error).getField())
         .collect(Collectors.joining(", "));
-    return ResponseEntity.status(409).body(new StatusMessageDTO(message));
+    return ResponseEntity.status(409).body(new StatusMessageDTO(message, ex.getClass().getSimpleName()));
   }
 
   @Override
@@ -64,6 +68,42 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     String message = "Missing parameter(s): " + ex.getBindingResult().getAllErrors().stream()
         .map((error) -> ((FieldError) error).getField())
         .collect(Collectors.joining(", "));
-    return ResponseEntity.status(409).body(new StatusMessageDTO(message));
+    return ResponseEntity.status(409).body(new StatusMessageDTO(message, ex.getClass().getSimpleName()));
+  }
+
+  @ExceptionHandler({DateConversionException.class})
+  public ResponseEntity<Object> handleDateConversionException(DateConversionException ex,
+                                                              WebRequest request) {
+    return handleExceptionInternal(
+      ex,
+      new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+      new HttpHeaders(),
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      request
+    );
+  }
+
+  @ExceptionHandler({NoTrainingRepresentedException.class})
+  public ResponseEntity<Object> handleNoTrainingRepresentedException(NoTrainingRepresentedException ex,
+                                                                     WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.CONFLICT,
+        request
+    );
+  }
+
+  @ExceptionHandler({ValidationException.class})
+  public ResponseEntity<Object> handleValidationException(ValidationException ex,
+                                                          WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.CONFLICT,
+        request
+    );
   }
 }
