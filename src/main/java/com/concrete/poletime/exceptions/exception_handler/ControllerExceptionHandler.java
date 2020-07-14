@@ -128,4 +128,16 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         request
     );
   }
+
+  @ExceptionHandler({TrainingTpeException.class})
+  public ResponseEntity<Object> handleTrainingTpeException(TrainingTpeException ex,
+                                                           WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.CONFLICT,
+        request
+    );
+  }
 }

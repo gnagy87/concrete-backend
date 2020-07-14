@@ -138,14 +138,23 @@ public class TrainingServiceImpl implements TrainingService {
 
   @Override
   public List<TrainingDTO> setUserToTraining(Long trainingId, Long guestUserId) throws
-      NoTrainingRepresentedException, RecordNotFoundException, ValidationException {
+      NoTrainingRepresentedException, RecordNotFoundException, ValidationException, TrainingTpeException {
     Training training = loadTrainingById(trainingId);
+    isTrainingTypeGroup(training.getType());
     PoleUser guestUser = userService.loadUserById(guestUserId);
     validationService.validateSignUpAttempt(training, guestUser, 0);
     training.setParticipants(training.getParticipants() + 1);
     guestUser.addTraining(training);
     PoleUser signedUpUser = userService.saveUser(guestUser);
     return convertToDTOList(new ArrayList<>(signedUpUser.getTrainings()));
+  }
+
+  @Override
+  public void isTrainingTypeGroup(TrainingType trainingType) throws TrainingTpeException {
+    if (!trainingType.toString().toUpperCase().equals(TrainingType.GROUP.toString())) {
+      throw new TrainingTpeException(
+          "Invalid training type! Cannot sign user to training that has different training type than 'GROUP'");
+    }
   }
 
   public List<TrainingDTO> convertToDTOList(List<Training> trainings) {

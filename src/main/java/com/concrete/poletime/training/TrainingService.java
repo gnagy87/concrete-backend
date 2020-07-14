@@ -4,6 +4,7 @@ import com.concrete.poletime.dto.TrainingDTO;
 import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.*;
 import com.concrete.poletime.user.PoleUser;
+import com.concrete.poletime.utils.TrainingType;
 import org.springframework.security.access.AccessDeniedException;
 
 import javax.persistence.PersistenceException;
@@ -25,5 +26,6 @@ public interface TrainingService {
     List<PoleUser> loadUsersByTraining(Long trainingId) throws NoTrainingRepresentedException;
     List<TrainingDTO> getGroupTrainings(String fromDate, String toDate) throws ValidationException, DateConversionException, CannotLoadDataFromDbException;
     List<TrainingDTO> getNonGroupTrainings() throws CannotLoadDataFromDbException;
-    List<TrainingDTO> setUserToTraining(Long trainingId, Long guestUserId) throws NoTrainingRepresentedException, RecordNotFoundException, ValidationException;
+    List<TrainingDTO> setUserToTraining(Long trainingId, Long guestUserId) throws NoTrainingRepresentedException, RecordNotFoundException, ValidationException, TrainingTpeException;
+    void isTrainingTypeGroup(TrainingType trainingType) throws TrainingTpeException;
 }
