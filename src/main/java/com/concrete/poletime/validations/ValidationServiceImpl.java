@@ -5,6 +5,9 @@ import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.seasonticket.SeasonTicket;
+import com.concrete.poletime.training.Training;
+import com.concrete.poletime.user.PoleUser;
+import com.concrete.poletime.utils.Role;
 import com.concrete.poletime.utils.TrainingHall;
 import com.concrete.poletime.utils.TrainingLevel;
 import com.concrete.poletime.utils.TrainingType;
@@ -129,13 +132,18 @@ public class ValidationServiceImpl implements ValidationService {
       LocalDate validFrom = ticket.getValidFrom();
       LocalDate validTo = ticket.getValidTo();
       if(trainingDate.isBefore(validTo) &&
-          (trainingDate.isAfter(validFrom) || trainingDate.isEqual(validFrom)) &&
-            ticket.getAmount() > ticket.getUsed()) {
-        ticket.setUsed(ticket.getUsed() + 1);
+          (trainingDate.isAfter(validFrom) || trainingDate.isEqual(validFrom))) {
         return ticket;
       }
     }
     throw new ValidationException("User does not have valid season ticket to participate on given training!");
+  }
+
+  @Override
+  public void userHasAmountToUse(SeasonTicket ticket) throws ValidationException {
+    if (ticket.getAmount() <= ticket.getUsed()) {
+      throw new ValidationException("User has reached ticket limit. No amount to be used!");
+    }
   }
 
   @Override
@@ -165,5 +173,39 @@ public class ValidationServiceImpl implements ValidationService {
   private void trainingDateValidatorHelper(String trainingFrom, String trainingTo) throws ValidationException {
     trainingDateValidator(trainingFrom);
     trainingDateValidator(trainingTo);
+  }
+
+  @Override
+  public void userFilter(PoleUser poleUser) throws ValidationException {
+    if (!poleUser.isEnabled() || poleUser.getRole().equals(Role.ADMIN) || poleUser.getRole().equals(Role.TRAINER)) {
+      throw new ValidationException("User is not acceptable! User is not enabled/ADMIN/TRAINER");
+    }
+  }
+
+  @Override
+  public void validate24hours(Long trainingFrom, Long now) throws ValidationException {
+    long oneDay = 24 * 60 * 60 * 1000L;
+    if(Math.abs(now - trainingFrom) < oneDay) {
+      throw new ValidationException("Unable to sign down from training, within 24hrs before training start.");
+    }
+  }
+
+  @Override
+  public void validateSignUpAttempt(Training training, PoleUser user) throws ValidationException {
+    userFilter(user);
+    isTrainingLimitExceeded(training.getPersonLimit(), training.getParticipants());
+    currentSigUpTimeIsNotAbove(training.getTrainingFrom().getTime(), new Date(System.currentTimeMillis()).getTime());
+    if (training.getPoleUsers().contains(user)) {
+      throw new ValidationException("Invalid attempt! User already participate on given training!");
+    }
+  }
+
+  @Override
+  public void validateSignDownAttempt(Training training, PoleUser user) throws ValidationException {
+    userFilter(user);
+    if (!training.getPoleUsers().contains(user)) {
+      throw new ValidationException("Invalid attempt! User is not participate on given training!");
+    }
+    validate24hours(training.getTrainingFrom().getTime(), new Date(System.currentTimeMillis()).getTime());
   }
 }

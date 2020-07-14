@@ -6,6 +6,7 @@ import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.NoTrainingRepresentedException;
 import com.concrete.poletime.exceptions.TrainingException;
 import com.concrete.poletime.exceptions.ValidationException;
+import com.concrete.poletime.seasonticket.SeasonTicket;
 import com.concrete.poletime.user.PoleUser;
 import com.concrete.poletime.user.PoleUserService;
 import com.concrete.poletime.utils.Role;
@@ -20,9 +21,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.PersistenceException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,24 +70,41 @@ public class TrainingServiceImpl implements TrainingService {
   public List<TrainingDTO> signUpForTraining(Long trainingId, PoleUser user) throws
       ValidationException, NoTrainingRepresentedException, PersistenceException, DateConversionException {
     Training training = loadTrainingById(trainingId);
-    validationService.isTrainingLimitExceeded(training.getPersonLimit(), training.getParticipants());
-    validationService.currentSigUpTimeIsNotAbove(training.getTrainingFrom().getTime(),
-        new Date(System.currentTimeMillis()).getTime());
-    validationService.userHasValidSeasonTicket(user.getSeasonTickets(), training.getTrainingFrom());
+    validationService.validateSignUpAttempt(training, user);
+    SeasonTicket ticket = validationService.userHasValidSeasonTicket(user.getSeasonTickets(), training.getTrainingFrom());
+    validationService.userHasAmountToUse(ticket);
+    ticket.setUsed(ticket.getUsed() + 1);
     training.setParticipants(training.getParticipants() + 1);
     user.addTraining(training);
     PoleUser signedUpUser = userService.saveUser(user);
-    return signedUpUser.getTrainings().stream()
-        .map(TrainingDTO::new)
-        .filter(t -> !t.isHeld())
-        .collect(Collectors.toList());
+    return convertToDTOList(signedUpUser.getTrainings());
   }
 
   @Override
   public Training loadTrainingById(Long trainingId) throws NoTrainingRepresentedException {
     return trainingRepo.findById(trainingId).orElseThrow(
-        () -> new NoTrainingRepresentedException(
+        () -> new NoTrainingRepresentedException (
             "No training present with given id(" + trainingId + ") !"));
+  }
+
+  @Override
+  public List<TrainingDTO> signDownFromTraining(Long trainingId, PoleUser user) throws
+      NoTrainingRepresentedException, ValidationException, DateConversionException {
+    Training training = loadTrainingById(trainingId);
+    validationService.validateSignDownAttempt(training, user);
+    SeasonTicket ticket = validationService.userHasValidSeasonTicket(user.getSeasonTickets(), training.getTrainingFrom());
+    user.removeTraining(training);
+    ticket.setUsed(ticket.getUsed() - 1);
+    training.setParticipants(training.getParticipants() - 1);
+    PoleUser signedDownUser = userService.saveUser(user);
+    return convertToDTOList(signedDownUser.getTrainings());
+  }
+
+  public List<TrainingDTO> convertToDTOList(Set<Training> trainings) {
+    return trainings.stream()
+        .map(TrainingDTO::new)
+        .filter(t -> !t.isHeld())
+        .collect(Collectors.toList());
   }
 
   private void roleFilter(PoleUser user, String type) throws AccessDeniedException {
