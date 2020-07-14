@@ -128,6 +128,14 @@ public class TrainingServiceImpl implements TrainingService {
     return convertToDTOList(groupTrainings);
   }
 
+  @Override
+  public List<TrainingDTO> getNonGroupTrainings() throws CannotLoadDataFromDbException {
+    List<Training> nonGroupTrainings = trainingRepo.loadNonGroupTrainings()
+        .orElseThrow(() -> new CannotLoadDataFromDbException(
+            "Error occurred during retrieval of DB elements! No any DB elements found by given date interval."));
+    return convertToDTOList(nonGroupTrainings);
+  }
+
   public List<TrainingDTO> convertToDTOList(List<Training> trainings) {
     return trainings.stream()
         .map(TrainingDTO::new)
