@@ -13,13 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/seasonTicket")
+@Validated
 public class SeasonTicketControllerAPI {
 
   private SeasonTicketService seasonTicketService;
@@ -36,7 +39,8 @@ public class SeasonTicketControllerAPI {
 
   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
   @PostMapping("/create")
-  public ResponseEntity setSeasonTicketToGuest(@RequestBody SeasonTicketParamsDTO seasonTicketParams, HttpServletRequest request) {
+  public ResponseEntity setSeasonTicketToGuest(@Valid @RequestBody SeasonTicketParamsDTO seasonTicketParams,
+                                               HttpServletRequest request) {
     try {
       Long sellerId = authService.getUserIdFromToken(request);
       PoleUser poleUser = poleUserService.loadUserByEmail(seasonTicketParams.getEmail());
@@ -52,7 +56,8 @@ public class SeasonTicketControllerAPI {
 
   @PreAuthorize("hasAuthority('ADMIN')")
   @PutMapping("/update")
-  public ResponseEntity updateSeasonTicket(@RequestParam("seasonTicketId")Long seasonTicketId, @RequestBody SeasonTicketParamsDTO seasonTicketParams) {
+  public ResponseEntity updateSeasonTicket(@RequestParam("seasonTicketId")Long seasonTicketId,
+                                           @Valid @RequestBody SeasonTicketParamsDTO seasonTicketParams) {
     try {
       return ResponseEntity.ok().body(seasonTicketService.updateSeasonTicket(seasonTicketId, seasonTicketParams));
     } catch (SeasonTicketException | ValidationException | RecordNotFoundException | DateConversionException exc) {
