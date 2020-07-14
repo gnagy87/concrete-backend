@@ -192,10 +192,12 @@ public class ValidationServiceImpl implements ValidationService {
   }
 
   @Override
-  public void validateSignUpAttempt(Training training, PoleUser user) throws ValidationException {
+  public void validateSignUpAttempt(Training training, PoleUser user, int withTimeLimit) throws ValidationException {
     userFilter(user);
     isTrainingLimitExceeded(training.getPersonLimit(), training.getParticipants());
-    currentSigUpTimeIsNotAbove(training.getTrainingFrom().getTime(), new Date(System.currentTimeMillis()).getTime());
+    if (withTimeLimit == 1) {
+      currentSigUpTimeIsNotAbove(training.getTrainingFrom().getTime(), new Date(System.currentTimeMillis()).getTime());
+    }
     if (training.getPoleUsers().contains(user)) {
       throw new ValidationException("Invalid attempt! User already participate on given training!");
     }

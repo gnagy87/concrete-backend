@@ -25,4 +25,5 @@ public interface TrainingService {
     List<PoleUser> loadUsersByTraining(Long trainingId) throws NoTrainingRepresentedException;
     List<TrainingDTO> getGroupTrainings(String fromDate, String toDate) throws ValidationException, DateConversionException, CannotLoadDataFromDbException;
     List<TrainingDTO> getNonGroupTrainings() throws CannotLoadDataFromDbException;
+    List<TrainingDTO> setUserToTraining(Long trainingId, Long guestUserId) throws NoTrainingRepresentedException, RecordNotFoundException, ValidationException;
 }
