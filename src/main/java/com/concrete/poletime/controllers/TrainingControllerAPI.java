@@ -150,4 +150,19 @@ public class TrainingControllerAPI {
       );
     }
   }
+
+  @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
+  @PostMapping("/unsetuser")
+  public ResponseEntity unSetUserToTraining(@RequestParam("trainingId") Long trainingId,
+                                            @RequestParam("guestUserId") Long guestUserId) {
+    try {
+      return ResponseEntity.status(200).body(trainingService.unSetUserToTraining(trainingId, guestUserId));
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          e.getMessage(),
+          e
+      );
+    }
+  }
 }

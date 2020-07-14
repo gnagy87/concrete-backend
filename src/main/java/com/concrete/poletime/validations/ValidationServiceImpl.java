@@ -204,12 +204,14 @@ public class ValidationServiceImpl implements ValidationService {
   }
 
   @Override
-  public void validateSignDownAttempt(Training training, PoleUser user) throws ValidationException {
+  public void validateSignDownAttempt(Training training, PoleUser user, int withTimeLimit) throws ValidationException {
     userFilter(user);
     if (!training.getPoleUsers().contains(user)) {
       throw new ValidationException("Invalid attempt! User is not participate on given training!");
     }
-    validate24hours(training.getTrainingFrom().getTime(), new Date(System.currentTimeMillis()).getTime());
+    if (withTimeLimit == 1) {
+      validate24hours(training.getTrainingFrom().getTime(), new Date(System.currentTimeMillis()).getTime());
+    }
   }
 
   @Override

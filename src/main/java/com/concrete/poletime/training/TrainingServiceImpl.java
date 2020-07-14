@@ -88,7 +88,7 @@ public class TrainingServiceImpl implements TrainingService {
   public List<TrainingDTO> signDownFromTraining(Long trainingId, PoleUser user) throws
       NoTrainingRepresentedException, ValidationException, DateConversionException {
     Training training = loadTrainingById(trainingId);
-    validationService.validateSignDownAttempt(training, user);
+    validationService.validateSignDownAttempt(training, user, 1);
     SeasonTicket ticket = validationService.userHasValidSeasonTicket(user.getSeasonTickets(), training.getTrainingFrom());
     user.removeTraining(training);
     ticket.setUsed(ticket.getUsed() - 1);
@@ -150,10 +150,23 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
+  public List<TrainingDTO> unSetUserToTraining(Long trainingId, Long guestUserId) throws
+      NoTrainingRepresentedException, TrainingTypeException, RecordNotFoundException, ValidationException {
+    Training training = loadTrainingById(trainingId);
+    isTrainingTypeGroup(training.getType());
+    PoleUser guestUser = userService.loadUserById(guestUserId);
+    validationService.validateSignDownAttempt(training, guestUser, 0);
+    training.setParticipants(training.getParticipants() - 1);
+    guestUser.removeTraining(training);
+    PoleUser signedDownUser = userService.saveUser(guestUser);
+    return convertToDTOList(new ArrayList<>(signedDownUser.getTrainings()));
+  }
+
+  @Override
   public void isTrainingTypeGroup(TrainingType trainingType) throws TrainingTypeException {
     if (!trainingType.toString().toUpperCase().equals(TrainingType.GROUP.toString())) {
       throw new TrainingTypeException(
-          "Invalid training type! Cannot sign user to training that has different training type than 'GROUP'");
+          "Invalid training type! Cannot sign up/down user to training that has different training type than 'GROUP' !");
     }
   }
 

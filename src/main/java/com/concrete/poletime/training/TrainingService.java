@@ -28,4 +28,5 @@ public interface TrainingService {
     List<TrainingDTO> getNonGroupTrainings() throws CannotLoadDataFromDbException;
     List<TrainingDTO> setUserToTraining(Long trainingId, Long guestUserId) throws NoTrainingRepresentedException, RecordNotFoundException, ValidationException, TrainingTypeException;
     void isTrainingTypeGroup(TrainingType trainingType) throws TrainingTypeException;
+    List<TrainingDTO> unSetUserToTraining(Long trainingId, Long guestUserId) throws NoTrainingRepresentedException, TrainingTypeException, RecordNotFoundException, ValidationException;
 }
