@@ -44,13 +44,13 @@ public class PoleUserServiceImpl implements PoleUserService {
       throw new RegistrationException("User with email: " + userParams.getEmail() + " has already been registered");
     }
     PoleUser newUser = new PoleUser(userParams.getEmail(), userParams.getFirstName(), userParams.getLastName(), passwordEncoder.encode(userParams.getPassword()));
-    poleUserRepo.save(newUser);
+    saveUser(newUser);
     return newUser;
   }
 
   @Override
-  public Long login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException, ValidationException, ConfirmationException {
-    loginValidationHelper(logRequest.getEmail(), logRequest.getPassword());
+  public Long login(LoginRequestDTO logRequest) throws RecordNotFoundException, LoginException, ConfirmationException {
+
     PoleUser foundUser = loadUserByEmail(logRequest.getEmail());
     if (!passwordEncoder.matches(logRequest.getPassword(), foundUser.getPassword())) {
       throw new LoginException("Password is not correct!");
@@ -59,19 +59,13 @@ public class PoleUserServiceImpl implements PoleUserService {
     return foundUser.getId();
   }
 
-  private void loginValidationHelper(String email, String password) throws ValidationException {
-    validation.emailValidation(email);
-    validation.passwordValidation(password);
-  }
-
   @Override
   public PoleUser loadUserByEmail(String email) throws RecordNotFoundException {
-    return poleUserRepo.findPoleUserByEmail(email)
-        .orElseThrow(() -> new RecordNotFoundException("User does not exist"));
+    return poleUserRepo.findPoleUserByEmail(email).orElseThrow(RecordNotFoundException::new);
   }
 
   @Override
-  public List getUsersWithValidSeasonTicket() {
+  public List<PoleUserDTO> getUsersWithValidSeasonTicket() {
     List<PoleUserDTO> poleUserDTOS = new ArrayList<>();
     poleUserRepo.findPoleUsersWithValidSeasonTicket().forEach(
         poleUser -> poleUserDTOS.add(new PoleUserDTO(poleUser))
@@ -81,8 +75,7 @@ public class PoleUserServiceImpl implements PoleUserService {
 
   @Override
   public PoleUser loadUserById(Long id) throws RecordNotFoundException {
-    return poleUserRepo.findById(id)
-        .orElseThrow(() -> new RecordNotFoundException("User does not exist"));
+    return poleUserRepo.findById(id).orElseThrow(RecordNotFoundException::new);
   }
 
   @Override
@@ -91,7 +84,7 @@ public class PoleUserServiceImpl implements PoleUserService {
     updateName(user, userParams.getFirstName(), true);
     updateName(user, userParams.getLastName(), false);
     updatePassword(user, userParams.getPassword());
-    poleUserRepo.save(user);
+    saveUser(user);
     return new PoleUserDTO(user);
   }
 
@@ -100,7 +93,7 @@ public class PoleUserServiceImpl implements PoleUserService {
     PoleUser userToConfirm = loadUserById(confirmationToken.getUser().getId());
     if (userToConfirm.isEnabled()) throw new ConfirmationException("User has already been verified");
     userToConfirm.setEnabled(true);
-    poleUserRepo.save(userToConfirm);
+    saveUser(userToConfirm);
     return userToConfirm.getEmail();
   }
 

@@ -71,7 +71,6 @@ public class TrainingServiceImpl implements TrainingService {
     SeasonTicket ticket = validationService.userHasValidSeasonTicket(user.getSeasonTickets(), training.getTrainingFrom());
     validationService.userHasAmountToUse(ticket);
     ticket.setUsed(ticket.getUsed() + 1);
-    training.setParticipants(training.getParticipants() + 1);
     user.addTraining(training);
     PoleUser signedUpUser = userService.saveUser(user);
     return convertToDTOList(new ArrayList<>(signedUpUser.getTrainings()));
@@ -92,7 +91,6 @@ public class TrainingServiceImpl implements TrainingService {
     SeasonTicket ticket = validationService.userHasValidSeasonTicket(user.getSeasonTickets(), training.getTrainingFrom());
     user.removeTraining(training);
     ticket.setUsed(ticket.getUsed() - 1);
-    training.setParticipants(training.getParticipants() - 1);
     PoleUser signedDownUser = userService.saveUser(user);
     return convertToDTOList(new ArrayList<>(signedDownUser.getTrainings()));
   }
@@ -143,7 +141,6 @@ public class TrainingServiceImpl implements TrainingService {
     isTrainingTypeGroup(training.getType());
     PoleUser guestUser = userService.loadUserById(guestUserId);
     validationService.validateSignUpAttempt(training, guestUser, 0);
-    training.setParticipants(training.getParticipants() + 1);
     guestUser.addTraining(training);
     PoleUser signedUpUser = userService.saveUser(guestUser);
     return convertToDTOList(new ArrayList<>(signedUpUser.getTrainings()));
@@ -156,7 +153,6 @@ public class TrainingServiceImpl implements TrainingService {
     isTrainingTypeGroup(training.getType());
     PoleUser guestUser = userService.loadUserById(guestUserId);
     validationService.validateSignDownAttempt(training, guestUser, 0);
-    training.setParticipants(training.getParticipants() - 1);
     guestUser.removeTraining(training);
     PoleUser signedDownUser = userService.saveUser(guestUser);
     return convertToDTOList(new ArrayList<>(signedDownUser.getTrainings()));
