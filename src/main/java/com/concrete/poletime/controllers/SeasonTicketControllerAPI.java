@@ -2,6 +2,7 @@ package com.concrete.poletime.controllers;
 
 import com.concrete.poletime.authentication.AuthenticationService;
 import com.concrete.poletime.dto.SeasonTicketParamsDTO;
+import com.concrete.poletime.dto.SeasonTicketUpdateParamsDTO;
 import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.SeasonTicketException;
@@ -56,10 +57,9 @@ public class SeasonTicketControllerAPI {
 
   @PreAuthorize("hasAuthority('ADMIN')")
   @PutMapping("/update")
-  public ResponseEntity updateSeasonTicket(@RequestParam("seasonTicketId")Long seasonTicketId,
-                                           @Valid @RequestBody SeasonTicketParamsDTO seasonTicketParams) {
+  public ResponseEntity updateSeasonTicket(@Valid @RequestBody SeasonTicketUpdateParamsDTO seasonTicketParams) {
     try {
-      return ResponseEntity.ok().body(seasonTicketService.updateSeasonTicket(seasonTicketId, seasonTicketParams));
+      return ResponseEntity.ok().body(seasonTicketService.updateSeasonTicket(seasonTicketParams));
     } catch (SeasonTicketException | ValidationException | RecordNotFoundException | DateConversionException exc) {
       throw new ResponseStatusException(
         (exc instanceof RecordNotFoundException) ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST,
