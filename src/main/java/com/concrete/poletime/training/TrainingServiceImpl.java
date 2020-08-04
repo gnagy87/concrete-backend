@@ -175,6 +175,20 @@ public class TrainingServiceImpl implements TrainingService {
     }
   }
 
+  @Override
+  public List<TrainingDTO> getAllTrainings(String fromDate, String toDate) throws ValidationException,
+      DateConversionException, CannotLoadDataFromDbException {
+    validationService.trainingDateValidator(fromDate);
+    validationService.trainingDateValidator(toDate);
+    Date parsedFromDate = dateService.trainingDateParser(fromDate);
+    Date parsedToDate = dateService.trainingDateParser(toDate);
+    validationService.validateFromDateIsNotAfter(parsedFromDate, parsedToDate);
+    List<Training> trainings = trainingRepo.loadAllTrainingsBetween(parsedFromDate, parsedToDate)
+        .orElseThrow(() -> new CannotLoadDataFromDbException(
+            "Error occurred during retrieval of DB elements! No any DB elements found by given date interval."));
+    return convertToDTOList(trainings);
+  }
+
   public List<TrainingDTO> convertToDTOList(List<Training> trainings) {
     return trainings.stream()
         .map(TrainingDTO::new)

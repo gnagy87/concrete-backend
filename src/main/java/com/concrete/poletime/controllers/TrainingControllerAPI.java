@@ -165,4 +165,15 @@ public class TrainingControllerAPI {
       );
     }
   }
+
+  @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
+  @PostMapping("/alltrainings")
+  public ResponseEntity getAllTrainings(@RequestParam("fromDate") String fromDate,
+                                        @RequestParam("toDate") String toDate) {
+    try {
+      return ResponseEntity.status(200).body(trainingService.getAllTrainings(fromDate, toDate));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+    }
+  }
 }

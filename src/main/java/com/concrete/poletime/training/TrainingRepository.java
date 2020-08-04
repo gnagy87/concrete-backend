@@ -38,4 +38,13 @@ public interface TrainingRepository extends CrudRepository<Training, Long> {
         nativeQuery = true
     )
     Optional<List<Training>> loadNonGroupTrainings();
+
+    @Query(
+        value = "SELECT * FROM trainings " +
+            "AND training_from >= ?1 " +
+            "AND training_to <= ?2 " +
+            "ORDER BY training_from, training_to",
+        nativeQuery = true
+    )
+    Optional<List<Training>> loadAllTrainingsBetween(Date fromDate, Date toDate);
 }
