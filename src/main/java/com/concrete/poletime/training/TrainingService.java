@@ -30,4 +30,5 @@ public interface TrainingService {
     List<TrainingDTO> setUserToTraining(Long trainingId, Long guestUserId) throws NoTrainingRepresentedException, RecordNotFoundException, ValidationException, TrainingTypeException;
     void isTrainingTypeGroup(TrainingType trainingType) throws TrainingTypeException;
     List<TrainingDTO> unSetUserToTraining(Long trainingId, Long guestUserId) throws NoTrainingRepresentedException, TrainingTypeException, RecordNotFoundException, ValidationException;
+    List<TrainingDTO> getAllTrainings(String fromDate, String toDate) throws ValidationException, DateConversionException, CannotLoadDataFromDbException;
 }
