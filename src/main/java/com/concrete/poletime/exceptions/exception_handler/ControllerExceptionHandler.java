@@ -5,6 +5,7 @@ import com.concrete.poletime.exceptions.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.security.auth.login.LoginException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -141,4 +143,88 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     );
   }
 
+  @ExceptionHandler({RegistrationException.class})
+  public ResponseEntity<Object> handleRegistrationException(RegistrationException ex,
+                                                           WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.BAD_REQUEST,
+        request
+    );
+  }
+
+
+  @ExceptionHandler({ConfirmationException.class})
+  public ResponseEntity<Object> handleConfirmationException(ConfirmationException ex,
+                                                            WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.BAD_REQUEST,
+        request
+    );
+  }
+
+  @ExceptionHandler({RecordNotFoundException.class})
+  public ResponseEntity<Object> handleRecordNotFoundException(RecordNotFoundException ex,
+                                                            WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.NOT_FOUND,
+        request
+    );
+  }
+
+  @ExceptionHandler({LoginException.class})
+  public ResponseEntity<Object> handleLoginException(LoginException ex,
+                                                              WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.BAD_REQUEST,
+        request
+    );
+  }
+
+  @ExceptionHandler({AccessDeniedException.class})
+  public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex,
+                                                     WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.FORBIDDEN,
+        request
+    );
+  }
+
+  @ExceptionHandler({TrainingException.class})
+  public ResponseEntity<Object> handleTrainingException(TrainingException ex,
+                                                            WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.BAD_REQUEST,
+        request
+    );
+  }
+
+  @ExceptionHandler({SeasonTicketException.class})
+  public ResponseEntity<Object> handleSeasonTicketException(SeasonTicketException ex,
+                                                        WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.BAD_REQUEST,
+        request
+    );
+  }
 }
