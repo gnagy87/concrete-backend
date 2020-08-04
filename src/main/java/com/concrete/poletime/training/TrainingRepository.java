@@ -41,7 +41,7 @@ public interface TrainingRepository extends CrudRepository<Training, Long> {
 
     @Query(
         value = "SELECT * FROM trainings " +
-            "AND training_from >= ?1 " +
+            "WHERE training_from >= ?1 " +
             "AND training_to <= ?2 " +
             "ORDER BY training_from, training_to",
         nativeQuery = true
