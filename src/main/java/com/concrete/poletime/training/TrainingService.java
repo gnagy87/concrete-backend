@@ -1,5 +1,6 @@
 package com.concrete.poletime.training;
 
+import com.concrete.poletime.dto.PoleUserDTO;
 import com.concrete.poletime.dto.TrainingDTO;
 import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.*;
@@ -23,7 +24,7 @@ public interface TrainingService {
         NoTrainingRepresentedException, ValidationException, DateConversionException;
 
     TrainingDTO setTrainingIsHeld(Long trainingId) throws NoTrainingRepresentedException, TrainingIsHeldUnsettableException;
-    List<PoleUser> loadUsersByTraining(Long trainingId) throws NoTrainingRepresentedException;
+    List<PoleUserDTO> loadUsersByTraining(Long trainingId) throws NoTrainingRepresentedException;
     List<TrainingDTO> getGroupTrainings(String fromDate, String toDate) throws ValidationException, DateConversionException, CannotLoadDataFromDbException;
     List<TrainingDTO> getNonGroupTrainings() throws CannotLoadDataFromDbException;
     List<TrainingDTO> setUserToTraining(Long trainingId, Long guestUserId) throws NoTrainingRepresentedException, RecordNotFoundException, ValidationException, TrainingTypeException;
