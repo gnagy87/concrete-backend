@@ -3,6 +3,7 @@ package com.concrete.poletime.seasonticket;
 import com.concrete.poletime.dto.PoleUserDTO;
 import com.concrete.poletime.dto.SeasonTicketDTO;
 import com.concrete.poletime.dto.SeasonTicketParamsDTO;
+import com.concrete.poletime.dto.SeasonTicketUpdateParamsDTO;
 import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.SeasonTicketException;
@@ -59,15 +60,15 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
   }
 
   @Override
-  public SeasonTicketDTO updateSeasonTicket(Long seasonTicketId, SeasonTicketParamsDTO seasonTicketParams)
+  public SeasonTicketDTO updateSeasonTicket(SeasonTicketUpdateParamsDTO seasonTicketParams)
       throws SeasonTicketException, ValidationException, RecordNotFoundException, DateConversionException {
-    SeasonTicket seasonTicket = loadSeasonTicketById(seasonTicketId);
+    SeasonTicket seasonTicket = loadSeasonTicketById(seasonTicketParams.getSeasonTicketId());
     LocalDate validFrom = seasonTicket.getValidFrom();
     if (seasonTicketParams.getValidFrom() != null) {
       validationService.validityDateValidator(seasonTicketParams.getValidFrom());
       validFrom = dateService.ticketDateParser(seasonTicketParams.getValidFrom());
       updateDateFilter(validFrom);
-      if (seasonTicketRepo.findValidSeasonTicket(seasonTicket.getPoleUser().getId(), seasonTicketId, validFrom).isPresent())
+      if (seasonTicketRepo.findValidSeasonTicket(seasonTicket.getPoleUser().getId(), seasonTicketParams.getSeasonTicketId(), validFrom).isPresent())
         throw new SeasonTicketException("User has a valid season ticket");
       seasonTicket.setValidFrom(validFrom);
     }
