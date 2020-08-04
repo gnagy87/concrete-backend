@@ -18,6 +18,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.PersistenceException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +50,7 @@ public class TrainingServiceImpl implements TrainingService {
     validationService.validateTrainingParams(trainingParams);
     Date trainingFrom = dateService.trainingDateParser(trainingParams.getTrainingFrom());
     Date trainingTo = dateService.trainingDateParser(trainingParams.getTrainingTo());
+    if (trainingFrom.before(new Timestamp(System.currentTimeMillis()))) throw new TrainingException("Training cannot be set with past date. (trainingFrom: " + trainingFrom + ")");
     if (timeService.trainingTimeCalculator(trainingFrom, trainingTo) < 60) throw new TrainingException("Training can not be shorter than 60 min");
     if (isTrainingAccepted(trainingParams.getHall().toUpperCase(), trainingFrom, trainingTo)) throw new TrainingException("There is another training in the same time period");
     Training training = new Training(
