@@ -194,7 +194,9 @@ public class ValidationServiceImpl implements ValidationService {
   @Override
   public void validateSignUpAttempt(Training training, PoleUser user, int withTimeLimit) throws ValidationException {
     userFilter(user);
-    isTrainingLimitExceeded(training.getPersonLimit(), training.getParticipants());
+    if (training.getType().toString().equals(TrainingType.GROUP.toString())) {
+      isTrainingLimitExceeded(training.getPersonLimit(), training.getParticipants());
+    }
     if (withTimeLimit == 1) {
       currentSigUpTimeIsNotAbove(training.getTrainingFrom().getTime(), new Date(System.currentTimeMillis()).getTime());
     }
