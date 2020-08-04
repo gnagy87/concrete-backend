@@ -1,5 +1,6 @@
 package com.concrete.poletime.training;
 
+import com.concrete.poletime.dto.PoleUserDTO;
 import com.concrete.poletime.dto.TrainingDTO;
 import com.concrete.poletime.dto.TrainingParamsDTO;
 import com.concrete.poletime.exceptions.*;
@@ -111,9 +112,11 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
-  public List<PoleUser> loadUsersByTraining(Long trainingId) throws NoTrainingRepresentedException {
+  public List<PoleUserDTO> loadUsersByTraining(Long trainingId) throws NoTrainingRepresentedException {
     Training training = loadTrainingById(trainingId);
-    return new ArrayList<>(training.getPoleUsers());
+    return training.getPoleUsers().stream()
+        .map(PoleUserDTO::new)
+        .collect(Collectors.toList());
   }
 
   @Override
