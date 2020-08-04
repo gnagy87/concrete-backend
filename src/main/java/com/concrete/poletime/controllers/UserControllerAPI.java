@@ -127,4 +127,14 @@ public class UserControllerAPI {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exc.getMessage(), exc);
         }
     }
+
+    @GetMapping("/userdata")
+    public ResponseEntity getUserData(HttpServletRequest request) {
+        try {
+            PoleUser currentUser = authService.currentUser(request);
+            return ResponseEntity.status(200).body(new PoleUserDTO(currentUser));
+        } catch (Exception e) {
+            throw  new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        }
+    }
 }
