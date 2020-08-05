@@ -37,4 +37,5 @@ public interface ValidationService {
     void validateSignDownAttempt(Training training, PoleUser user, int withTimeLimit) throws ValidationException;
     void doesTrainingIsHeldSettable(Long trainingTo, Long now) throws TrainingIsHeldUnsettableException;
     void validateFromDateIsNotAfter(Date fromDate, Date toDate) throws ValidationException;
+    void hasNoOverlappingTickets(LocalDate validFrom , Set<SeasonTicket> seasonTickets) throws ValidationException;
 }

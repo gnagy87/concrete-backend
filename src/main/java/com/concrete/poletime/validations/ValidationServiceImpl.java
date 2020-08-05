@@ -229,4 +229,14 @@ public class ValidationServiceImpl implements ValidationService {
     if(toDate.before(fromDate)) {throw new ValidationException(
         "Invalid interval of dates: toDate is earlier than fromDate!");}
   }
+
+  @Override
+  public void hasNoOverlappingTickets(LocalDate newTicketValidFrom , Set<SeasonTicket> seasonTickets) throws ValidationException {
+    for (SeasonTicket ticket : seasonTickets) {
+      if (!ticket.getValidTo().isBefore(newTicketValidFrom)) {
+        throw new ValidationException("User already has got valid season ticket in given time period." +
+            " Given new ticket's 'validFrom', must not overlap with 'validTo' of any ticket that belongs to given user!");
+      }
+    }
+  }
 }

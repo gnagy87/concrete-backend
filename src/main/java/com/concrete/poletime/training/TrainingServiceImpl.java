@@ -62,7 +62,8 @@ public class TrainingServiceImpl implements TrainingService {
       TrainingType.valueOf(trainingParams.getType().toUpperCase()),
       trainingParams.getType().toUpperCase().equals((TrainingType.GROUP.toString())) ? TrainingLevel.valueOf(trainingParams.getLevel().toUpperCase()) : null,
       user.getId());
-    trainingRepo.save(training);
+//    trainingRepo.save(training);
+    saveTraining(training);
     return new TrainingDTO(training);
   }
 
@@ -105,7 +106,8 @@ public class TrainingServiceImpl implements TrainingService {
     validationService.doesTrainingIsHeldSettable(training.getTrainingTo().getTime(),
         new Date(System.currentTimeMillis()).getTime());
     training.setHeld(true);
-    trainingRepo.save(training);
+//    trainingRepo.save(training);
+    saveTraining(training);
     return new TrainingDTO(training);
   }
 
@@ -183,6 +185,15 @@ public class TrainingServiceImpl implements TrainingService {
         .orElseThrow(() -> new CannotLoadDataFromDbException(
             "Error occurred during retrieval of DB elements! No any DB elements found by given date interval."));
     return convertToDTOList(trainings);
+  }
+
+  @Override
+  public Training saveTraining(Training training) throws PersistenceException {
+    try {
+      return trainingRepo.save(training);
+    } catch (Exception e) {
+      throw new PersistenceException("Could not save given training to DB !", e);
+    }
   }
 
   public List<TrainingDTO> convertToDTOList(List<Training> trainings) {
