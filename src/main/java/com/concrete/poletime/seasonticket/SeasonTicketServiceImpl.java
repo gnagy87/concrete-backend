@@ -9,12 +9,12 @@ import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.SeasonTicketException;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.user.PoleUser;
-import com.concrete.poletime.utils.Role;
 import com.concrete.poletime.utils.dateservice.DateService;
 import com.concrete.poletime.validations.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.PersistenceException;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -44,8 +44,18 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
     LocalDate validTo = validToCalculator(validFrom, seasonTicketParams.getAmount());
     seasonTicketFilter(poleUser.getId(), validFrom);
     SeasonTicket seasonTicket = new SeasonTicket(validFrom, validTo, seasonTicketParams.getAmount(), sellerId, poleUser);
-    seasonTicketRepo.save(seasonTicket);
+//    seasonTicketRepo.save(seasonTicket);
+    saveSeasonTicket(seasonTicket);
     return new PoleUserDTO(poleUser);
+  }
+
+  @Override
+  public SeasonTicket saveSeasonTicket(SeasonTicket ticket) throws PersistenceException {
+    try {
+      return seasonTicketRepo.save(ticket);
+    } catch (Exception e) {
+      throw new PersistenceException("Could not save given season ticket to DB !", e);
+    }
   }
 
   private void seasonTicketFilter(Long userId, LocalDate validFrom) throws SeasonTicketException {
@@ -78,7 +88,8 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
       seasonTicket.setValidTo(validTo);
       seasonTicket.setAmount(seasonTicketParams.getAmount());
     }
-    seasonTicketRepo.save(seasonTicket);
+//    seasonTicketRepo.save(seasonTicket);
+    saveSeasonTicket(seasonTicket);
     return new SeasonTicketDTO(seasonTicket);
   }
 

@@ -10,6 +10,8 @@ import com.concrete.poletime.exceptions.SeasonTicketException;
 import com.concrete.poletime.exceptions.ValidationException;
 import com.concrete.poletime.user.PoleUser;
 
+import javax.persistence.PersistenceException;
+
 public interface SeasonTicketService {
     PoleUserDTO createSeasonTicket(SeasonTicketParamsDTO seasonTicketParams, Long sellerId, PoleUser poleUser)
         throws SeasonTicketException, ValidationException, DateConversionException;
@@ -18,4 +20,6 @@ public interface SeasonTicketService {
         throws SeasonTicketException, ValidationException, RecordNotFoundException, DateConversionException;
 
     SeasonTicket loadSeasonTicketById(Long seasonTicketId) throws RecordNotFoundException;
+
+    SeasonTicket saveSeasonTicket(SeasonTicket ticket) throws PersistenceException;
 }
