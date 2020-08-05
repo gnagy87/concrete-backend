@@ -44,7 +44,8 @@ public class PoleUserServiceImpl implements PoleUserService {
       throw new RegistrationException("User with email: " + userParams.getEmail() + " has already been registered");
     }
     PoleUser newUser = new PoleUser(userParams.getEmail(), userParams.getFirstName(), userParams.getLastName(), passwordEncoder.encode(userParams.getPassword()));
-    poleUserRepo.save(newUser);
+    saveUser(newUser);
+//    poleUserRepo.save(newUser);
     return newUser;
   }
 
@@ -91,7 +92,8 @@ public class PoleUserServiceImpl implements PoleUserService {
     updateName(user, userParams.getFirstName(), true);
     updateName(user, userParams.getLastName(), false);
     updatePassword(user, userParams.getPassword());
-    poleUserRepo.save(user);
+    saveUser(user);
+//    poleUserRepo.save(user);
     return new PoleUserDTO(user);
   }
 
