@@ -41,6 +41,7 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
     validationService.amountValidator(seasonTicketParams.getAmount());
     LocalDate validFrom = dateService.ticketDateParser(seasonTicketParams.getValidFrom());
     validationService.ticketDateFilter(validFrom);
+    validationService.hasNoOverlappingTickets(validFrom ,poleUser.getSeasonTickets());
     LocalDate validTo = validToCalculator(validFrom, seasonTicketParams.getAmount());
     seasonTicketFilter(poleUser.getId(), validFrom);
     SeasonTicket seasonTicket = new SeasonTicket(validFrom, validTo, seasonTicketParams.getAmount(), sellerId, poleUser);
@@ -77,6 +78,8 @@ public class SeasonTicketServiceImpl implements SeasonTicketService {
     if (seasonTicketParams.getValidFrom() != null) {
       validationService.validityDateValidator(seasonTicketParams.getValidFrom());
       validFrom = dateService.ticketDateParser(seasonTicketParams.getValidFrom());
+      validationService.ticketDateFilter(validFrom);
+      validationService.hasNoOverlappingTickets(validFrom, seasonTicket.getPoleUser().getSeasonTickets());
       updateDateFilter(validFrom);
       if (seasonTicketRepo.findValidSeasonTicket(seasonTicket.getPoleUser().getId(), seasonTicketParams.getSeasonTicketId(), validFrom).isPresent())
         throw new SeasonTicketException("User has a valid season ticket");
