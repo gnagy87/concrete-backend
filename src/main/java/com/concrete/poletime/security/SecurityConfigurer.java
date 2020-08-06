@@ -45,7 +45,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
             "/api/user/registration",
             "/api/user/confirm-account",
             "/api/user/resend-confirm-token",
-            "/api/training/grouptrainings").permitAll()
+            "/api/training/grouptrainings",
+            "/actuator/health").permitAll()
                 .anyRequest().authenticated()
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
