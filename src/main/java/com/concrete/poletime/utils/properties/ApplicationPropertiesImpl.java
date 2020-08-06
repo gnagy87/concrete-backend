@@ -1,4 +1,4 @@
-package com.concrete.poletime.utils;
+package com.concrete.poletime.utils.properties;
 
 import com.sun.istack.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;

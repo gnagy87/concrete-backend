@@ -2,7 +2,7 @@ package com.concrete.poletime.security;
 
 import com.concrete.poletime.jwt.JwtRequestFilter;
 import com.concrete.poletime.jwt.JwtUtil;
-import com.concrete.poletime.utils.ApplicationProperties;
+import com.concrete.poletime.utils.properties.ApplicationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
+
     private MyUserDetailsService myUserDetailsService;
     private JwtRequestFilter jwtRequestFilter;
     private ApplicationProperties properties;
@@ -45,7 +46,8 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
             "/api/user/registration",
             "/api/user/confirm-account",
             "/api/user/resend-confirm-token",
-            "/api/training/grouptrainings").permitAll()
+            "/api/training/grouptrainings",
+            "/actuator/health").permitAll()
                 .anyRequest().authenticated()
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

@@ -1,4 +1,4 @@
-package com.concrete.poletime.utils;
+package com.concrete.poletime.utils.properties;
 
 public interface ApplicationProperties {
     String getJwtSecretKey();
