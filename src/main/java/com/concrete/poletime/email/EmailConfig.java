@@ -1,6 +1,6 @@
 package com.concrete.poletime.email;
 
-import com.concrete.poletime.utils.ApplicationProperties;
+import com.concrete.poletime.utils.properties.ApplicationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
