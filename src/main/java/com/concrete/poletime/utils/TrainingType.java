@@ -5,5 +5,5 @@ public enum TrainingType {
     PRIVATE,
     PRACTICE_TRAINER,
     PRACTICE_GUEST,
-    PARTY // // GUEST user csak erre
+    PARTY // GUEST user csak erre
 }

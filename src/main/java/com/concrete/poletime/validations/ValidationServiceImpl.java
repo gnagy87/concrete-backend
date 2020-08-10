@@ -33,7 +33,7 @@ public class ValidationServiceImpl implements ValidationService {
 
   @Override
   public void emailValidation(String email) throws ValidationException {
-    if (!email.matches("[a-z0-9._-]{3,32}@[a-z0-9._-]{2,20}.[a-z]{2,3}")) {
+    if (!email.matches("[a-z0-9._-]{3,32}@[a-z0-9._-]{2,20}\\.[a-z]{2,3}")) {
       throw new ValidationException("Email format is not valid!");
     }
   }
@@ -231,7 +231,7 @@ public class ValidationServiceImpl implements ValidationService {
   }
 
   @Override
-  public void hasNoOverlappingTickets(LocalDate newTicketValidFrom , Set<SeasonTicket> seasonTickets) throws ValidationException {
+  public void hasNoOverlappingTickets(LocalDate newTicketValidFrom, Set<SeasonTicket> seasonTickets) throws ValidationException {
     for (SeasonTicket ticket : seasonTickets) {
       if (!ticket.getValidTo().isBefore(newTicketValidFrom)) {
         throw new ValidationException("User already has got valid season ticket in given time period." +
