@@ -3,8 +3,8 @@ package com.concrete.poletime.utils.dateservice;
 import com.concrete.poletime.exceptions.DateConversionException;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -14,8 +14,9 @@ public class DateServiceImpl implements DateService {
   @Override
   public LocalDate convertTrainingDateToLocalDate(Date trainingFrom) throws DateConversionException {
     try {
-      DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-      return LocalDate.parse(trainingFrom.toString(), format);
+//      DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+//      return LocalDate.parse(trainingFrom.toString());
+      return new java.sql.Date(trainingFrom.getTime()).toLocalDate();
     } catch (Exception e) {
       throw new DateConversionException("Could not parse given training date!", e);
     }
@@ -33,7 +34,9 @@ public class DateServiceImpl implements DateService {
   @Override
   public Date trainingDateParser(String dateToParse) throws DateConversionException {
     try {
-      return new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dateToParse);
+      LocalDateTime ldt = LocalDateTime.parse(dateToParse, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+      return java.sql.Timestamp.valueOf(ldt);
+//      return new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dateToParse);
     } catch (Exception e) {
       throw new DateConversionException("Could not parse training date!", e);
     }

@@ -47,7 +47,8 @@ public class Training {
     @ManyToMany(mappedBy = "trainings")
     private Set<PoleUser> poleUsers;
 
-    public Training(Date trainingFrom, Date trainingTo, TrainingHall hall, int personLimit, TrainingType type, TrainingLevel level, Long organizerId) {
+    public Training(Date trainingFrom, Date trainingTo, TrainingHall hall, int personLimit, TrainingType type,
+                    TrainingLevel level, Long organizerId) {
         this.trainingFrom = trainingFrom;
         this.trainingTo = trainingTo;
         this.hall = hall;
