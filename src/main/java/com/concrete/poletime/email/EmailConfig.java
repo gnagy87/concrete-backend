@@ -28,10 +28,11 @@ public class EmailConfig {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(properties.getMailSenderHost());
         javaMailSender.setPort(properties.getMailSenderPort());
-        javaMailSender.setProtocol("smtp");
         javaMailSender.setUsername(properties.getMailSenderUsername());
         javaMailSender.setPassword(properties.getMailSenderPassword());
+
         Properties mailProperties = new Properties();
+        mailProperties.put("mail.transport.protocol", "smtp");
         mailProperties.put("mail.smtp.auth", "true");
         mailProperties.put("mail.smtp.starttls.enable", "true");
         mailProperties.put("mail.smtp.ssl.trust", properties.getMailSenderHost());
