@@ -1,0 +1,17 @@
+version: 0.0
+os: linux
+files:
+  - source: target/concrete-test-app.jar
+    destination: /home/ec2-user/concrete/appjar/
+hooks:
+  BeforeInstall:
+    - location: scripts/stop_running_backend
+      timeout: 300
+      runas: root
+    - location: scripts/delete_existing_jar_file
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: scripts/run_newly_deployed_application
+      timeout: 300
+      runas: root
