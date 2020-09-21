@@ -1,7 +1,10 @@
 package com.concrete.poletime.controllers;
 
 import com.concrete.poletime.authentication.AuthenticationService;
+import com.concrete.poletime.dto.TrainingDateDTO;
+import com.concrete.poletime.dto.SignUpDTO;
 import com.concrete.poletime.dto.TrainingParamsDTO;
+import com.concrete.poletime.dto.UserToTrainingDTO;
 import com.concrete.poletime.exceptions.DateConversionException;
 import com.concrete.poletime.exceptions.RecordNotFoundException;
 import com.concrete.poletime.exceptions.TrainingException;
@@ -51,11 +54,11 @@ public class TrainingControllerAPI {
   }
 
   @PostMapping("/signup")
-  public ResponseEntity signUpToTraining(@RequestParam("trainingId") Long trainingId,
+  public ResponseEntity signUpToTraining(@RequestBody SignUpDTO signUpDTO,
                                          HttpServletRequest request) {
     try {
       PoleUser user = authService.currentUser(request);
-      return ResponseEntity.status(200).body(trainingService.signUpForTraining(trainingId, user));
+      return ResponseEntity.status(200).body(trainingService.signUpForTraining(signUpDTO.getTrainingId(), user));
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
@@ -66,11 +69,11 @@ public class TrainingControllerAPI {
   }
 
   @PostMapping("/signdown")
-  public ResponseEntity signDownFromTraining(@RequestParam("trainingId") Long trainingId,
+  public ResponseEntity signDownFromTraining(@RequestBody SignUpDTO signUpDTO,
                                              HttpServletRequest request) {
     try {
       PoleUser user = authService.currentUser(request);
-      return ResponseEntity.status(200).body(trainingService.signDownFromTraining(trainingId, user));
+      return ResponseEntity.status(200).body(trainingService.signDownFromTraining(signUpDTO.getTrainingId(), user));
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
@@ -82,9 +85,9 @@ public class TrainingControllerAPI {
 
   @PreAuthorize("hasAuthority('ADMIN')")
   @PutMapping("/isheld")
-  public ResponseEntity setTrainingIdIsHeld(@RequestParam("trainingId") Long trainingId) {
+  public ResponseEntity setTrainingIdIsHeld(@RequestBody SignUpDTO signUpDTO) {
     try {
-      return ResponseEntity.status(200).body(trainingService.setTrainingIsHeld(trainingId));
+      return ResponseEntity.status(200).body(trainingService.setTrainingIsHeld(signUpDTO.getTrainingId()));
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
@@ -96,9 +99,9 @@ public class TrainingControllerAPI {
 
   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
   @PostMapping("/ontraining")
-  public ResponseEntity trainingWithUsers(@RequestParam("trainingId") Long trainingId) {
+  public ResponseEntity trainingWithUsers(@RequestBody SignUpDTO signUpDTO) {
     try {
-      return ResponseEntity.status(200).body(trainingService.loadUsersByTraining(trainingId));
+      return ResponseEntity.status(200).body(trainingService.loadUsersByTraining(signUpDTO.getTrainingId()));
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
@@ -109,10 +112,11 @@ public class TrainingControllerAPI {
   }
 
   @PostMapping("/grouptrainings")
-  public ResponseEntity getGroupTrainings(@RequestParam("fromDate") String fromDate,
-                                          @RequestParam("toDate") String toDate) {
+  public ResponseEntity getGroupTrainings(@RequestBody TrainingDateDTO trainingDateDTO) {
     try {
-      return ResponseEntity.status(200).body(trainingService.getGroupTrainings(fromDate, toDate));
+      return ResponseEntity.status(200).body(trainingService.getGroupTrainings(
+          trainingDateDTO.getFromDate(),
+          trainingDateDTO.getToDate()));
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
@@ -138,10 +142,11 @@ public class TrainingControllerAPI {
 
   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
   @PostMapping("/setuser")
-  public ResponseEntity setUserToTraining(@RequestParam("trainingId") Long trainingId,
-                                          @RequestParam("guestUserId") Long guestUserId) {
+  public ResponseEntity setUserToTraining(@RequestBody UserToTrainingDTO userToTrainingDTO) {
     try {
-      return ResponseEntity.status(200).body(trainingService.setUserToTraining(trainingId, guestUserId));
+      return ResponseEntity.status(200).body(trainingService.setUserToTraining(
+          userToTrainingDTO.getTrainingId(),
+          userToTrainingDTO.getGuestUserId()));
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
@@ -153,10 +158,11 @@ public class TrainingControllerAPI {
 
   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
   @PostMapping("/unsetuser")
-  public ResponseEntity unSetUserToTraining(@RequestParam("trainingId") Long trainingId,
-                                            @RequestParam("guestUserId") Long guestUserId) {
+  public ResponseEntity unSetUserToTraining(@RequestBody UserToTrainingDTO userToTrainingDTO) {
     try {
-      return ResponseEntity.status(200).body(trainingService.unSetUserToTraining(trainingId, guestUserId));
+      return ResponseEntity.status(200).body(trainingService.unSetUserToTraining(
+          userToTrainingDTO.getTrainingId(),
+          userToTrainingDTO.getGuestUserId()));
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
@@ -168,10 +174,11 @@ public class TrainingControllerAPI {
 
   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINER')")
   @PostMapping("/alltrainings")
-  public ResponseEntity getAllTrainings(@RequestParam("fromDate") String fromDate,
-                                        @RequestParam("toDate") String toDate) {
+  public ResponseEntity getAllTrainings(@RequestBody TrainingDateDTO trainingDateDTO) {
     try {
-      return ResponseEntity.status(200).body(trainingService.getAllTrainings(fromDate, toDate));
+      return ResponseEntity.status(200).body(trainingService.getAllTrainings(
+          trainingDateDTO.getFromDate(),
+          trainingDateDTO.getToDate()));
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
     }

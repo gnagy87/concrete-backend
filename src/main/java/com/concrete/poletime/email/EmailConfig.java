@@ -16,38 +16,38 @@ import java.util.Properties;
 @ComponentScan(basePackages = "com.concrete.poletime")
 public class EmailConfig {
 
-    private ApplicationProperties properties;
+  private ApplicationProperties properties;
 
-    @Autowired
-    public EmailConfig(ApplicationProperties properties) {
-        this.properties = properties;
-    }
+  @Autowired
+  public EmailConfig(ApplicationProperties properties) {
+    this.properties = properties;
+  }
 
-    @Bean(name = "mailSender")
-    public MailSender javaMailService() {
-        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-        javaMailSender.setHost(properties.getMailSenderHost());
-        javaMailSender.setPort(properties.getMailSenderPort());
-        javaMailSender.setUsername(properties.getMailSenderUsername());
-        javaMailSender.setPassword(properties.getMailSenderPassword());
+  @Bean(name = "mailSender")
+  public MailSender javaMailService() {
+    JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+    javaMailSender.setHost(properties.getMailSenderHost());
+    javaMailSender.setPort(properties.getMailSenderPort());
+    javaMailSender.setUsername(properties.getMailSenderUsername());
+    javaMailSender.setPassword(properties.getMailSenderPassword());
 
-        Properties mailProperties = new Properties();
-        mailProperties.put("mail.transport.protocol", "smtp");
-        mailProperties.put("mail.smtp.auth", "true");
-        mailProperties.put("mail.smtp.starttls.enable", "true");
-        mailProperties.put("mail.smtp.ssl.trust", properties.getMailSenderHost());
-        mailProperties.put("mail.smtp.debug", "true");
-        javaMailSender.setJavaMailProperties(mailProperties);
-        return javaMailSender;
-    }
+    Properties mailProperties = new Properties();
+    mailProperties.put("mail.transport.protocol", "smtp");
+    mailProperties.put("mail.smtp.auth", "true");
+    mailProperties.put("mail.smtp.starttls.enable", "true");
+    mailProperties.put("mail.smtp.ssl.trust", properties.getMailSenderHost());
+    mailProperties.put("mail.smtp.debug", "true");
+    javaMailSender.setJavaMailProperties(mailProperties);
+    return javaMailSender;
+  }
 
-    @Bean
-    public MessageSource messageSource() {
-        final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:messages");
-        messageSource.setUseCodeAsDefaultMessage(true);
-        messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setCacheSeconds(0);
-        return messageSource;
-    }
+  @Bean
+  public MessageSource messageSource() {
+    final ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+    messageSource.setBasename("classpath:messages");
+    messageSource.setUseCodeAsDefaultMessage(true);
+    messageSource.setDefaultEncoding("UTF-8");
+    messageSource.setCacheSeconds(0);
+    return messageSource;
+  }
 }

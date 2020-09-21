@@ -248,4 +248,16 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         request
     );
   }
+
+  @ExceptionHandler({NoBlogPostRepresentedException.class})
+  public ResponseEntity<Object> handleNoBlogPostRepresentedException(NoBlogPostRepresentedException ex,
+                                                                     WebRequest request) {
+    return handleExceptionInternal(
+        ex,
+        new StatusMessageDTO(ex.getLocalizedMessage(), ex.getClass().getSimpleName()),
+        new HttpHeaders(),
+        HttpStatus.BAD_REQUEST,
+        request
+    );
+  }
 }
